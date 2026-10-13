@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Flux RSS FICTIF pour la démo hors ligne (`watch --offline`) et les tests.
+     Les articles et leurs chiffres sont inventés ; les URL pointent vers example.org. -->
+<rss version="2.0">
+  <channel>
+    <title>Actu Brassicole Démo (fictif)</title>
+    <link>https://example.org/actu</link>
+    <description>Flux de démonstration</description>
+
+    <item>
+      <title>Les cavistes indépendants misent sur les bières bio locales</title>
+      <link>https://example.org/actu/cavistes-bio-locales?utm_source=rss</link>
+      <pubDate>Mon, 12 Oct 2026 08:00:00 +0200</pubDate>
+      <description>Article fictif. Une enquête menée auprès de cavistes indépendants indique que les clients demandent de plus en plus l'origine des matières premières. Les bières bio produites près de chez eux sont citées comme un argument de vente facile à expliquer.</description>
+    </item>
+
+    <item>
+      <title>Horeca : le retour des fûts de bière artisanale en terrasse</title>
+      <link>https://example.org/actu/horeca-futs-terrasse</link>
+      <pubDate>Sun, 11 Oct 2026 10:30:00 +0200</pubDate>
+      <description>Article fictif. Plusieurs cafés de Wallonie élargissent leur offre de bières artisanales à la pression. Les exploitants évoquent une demande pour des bières plus légères et désaltérantes pendant la belle saison.</description>
+    </item>
+
+    <item>
+      <title>Label bio européen : ce que vérifient les organismes certificateurs</title>
+      <link>https://example.org/actu/controle-bio</link>
+      <pubDate>Sat, 10 Oct 2026 09:00:00 +0200</pubDate>
+      <description>Article fictif. Un dossier explique le déroulé d'un contrôle annuel de certification bio : traçabilité des ingrédients, factures fournisseurs, visite du site de production. Les consommateurs connaissent le logo mais rarement ce qu'il garantit.</description>
+    </item>
+
+    <item>
+      <title>Brasser en hiver : les brasseries artisanales préparent leurs bières de saison</title>
+      <link>https://example.org/actu/bieres-hiver</link>
+      <pubDate>Fri, 09 Oct 2026 14:00:00 +0200</pubDate>
+      <description>Article fictif. À l'approche de l'hiver, les petites brasseries lancent des bières plus maltées et plus rondes, souvent pensées pour accompagner les plats mijotés.</description>
+    </item>
+
+    <!-- Doublon volontaire (même URL sans paramètre de suivi) : doit être ignoré par la déduplication. -->
+    <item>
+      <title>Les cavistes indépendants misent sur les bières bio locales</title>
+      <link>https://example.org/actu/cavistes-bio-locales</link>
+      <pubDate>Mon, 12 Oct 2026 08:00:00 +0200</pubDate>
+      <description>Article fictif (doublon).</description>
+    </item>
+  </channel>
+</rss>

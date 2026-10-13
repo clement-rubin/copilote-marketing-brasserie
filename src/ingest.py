@@ -17,7 +17,7 @@ from pathlib import Path
 import chromadb
 import yaml
 
-from src.config import BRAND_DIR, CHROMA_DIR
+from src import config
 
 EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 COLLECTION = "brand"
@@ -165,9 +165,9 @@ def chunk_document(path: Path, count: TokenCounter = count_tokens) -> list[Chunk
 # --------------------------------------------------------------------------- Stockage
 
 
-def get_collection(chroma_dir: Path = CHROMA_DIR, reset: bool = False):
+def get_collection(chroma_dir: Path | None = None, reset: bool = False):
     """Ouvre (ou recrée) la collection ChromaDB. Les embeddings sont calculés par nous."""
-    client = chromadb.PersistentClient(path=str(chroma_dir))
+    client = chromadb.PersistentClient(path=str(chroma_dir or config.CHROMA_DIR))
     if reset and COLLECTION in [c.name for c in client.list_collections()]:
         client.delete_collection(COLLECTION)
     return client.get_or_create_collection(
@@ -175,8 +175,9 @@ def get_collection(chroma_dir: Path = CHROMA_DIR, reset: bool = False):
     )
 
 
-def ingest(brand_dir: Path = BRAND_DIR, chroma_dir: Path = CHROMA_DIR) -> list[Chunk]:
+def ingest(brand_dir: Path | None = None, chroma_dir: Path | None = None) -> list[Chunk]:
     """Réindexe tous les documents de marque. Idempotent : la collection est recréée."""
+    brand_dir = brand_dir or config.BRAND_DIR
     chunks = [c for path in sorted(brand_dir.glob("*.md")) for c in chunk_document(path)]
     if not chunks:
         raise FileNotFoundError(f"Aucun document markdown dans {brand_dir}")

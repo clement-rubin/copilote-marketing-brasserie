@@ -2,7 +2,6 @@
 
 from pathlib import Path
 
-from src.config import CHROMA_DIR
 from src.ingest import embed, get_collection
 from src.models import Passage
 
@@ -11,7 +10,7 @@ def retrieve(
     query: str,
     k: int = 5,
     doc_types: list[str] | None = None,
-    chroma_dir: Path = CHROMA_DIR,
+    chroma_dir: Path | None = None,
 ) -> list[Passage]:
     """Renvoie les `k` passages les plus proches de `query`, du plus au moins pertinent.
 
@@ -30,11 +29,16 @@ def retrieve(
     ]
 
 
-def retrieve_many(queries: list[str], k: int = 4, chroma_dir: Path = CHROMA_DIR) -> list[Passage]:
+def retrieve_many(
+    queries: list[str],
+    k: int = 4,
+    doc_types: list[str] | None = None,
+    chroma_dir: Path | None = None,
+) -> list[Passage]:
     """Fusionne les résultats de plusieurs requêtes, sans doublon, triés par score."""
     best: dict[str, Passage] = {}
     for query in queries:
-        for passage in retrieve(query, k=k, chroma_dir=chroma_dir):
+        for passage in retrieve(query, k=k, doc_types=doc_types, chroma_dir=chroma_dir):
             if passage.text not in best or passage.score > best[passage.text].score:
                 best[passage.text] = passage
     return sorted(best.values(), key=lambda p: p.score, reverse=True)

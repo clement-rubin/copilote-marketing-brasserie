@@ -1,9 +1,7 @@
 """Tests du découpage (rapides, sans modèle) et du RAG (avec le vrai modèle d'embedding)."""
 
-import pytest
-
 from src.config import BRAND_DIR
-from src.ingest import chunk_document, chunk_section, count_tokens, ingest, split_sections
+from src.ingest import chunk_document, chunk_section, count_tokens, split_sections
 from src.rag import retrieve, sources_of
 
 
@@ -34,14 +32,7 @@ def test_every_chunk_has_metadata():
     assert all(c.text.startswith("Fiche technique - Blonde Démo") for c in chunks)
 
 
-# --- Tests d'intégration : chargent le modèle (téléchargé au premier lancement) -------
-
-
-@pytest.fixture(scope="module")
-def chroma_dir(tmp_path_factory):
-    path = tmp_path_factory.mktemp("chroma")
-    ingest(chroma_dir=path)
-    return path
+# --- Tests d'intégration : chargent le modèle (fixture `chroma_dir` dans conftest.py) ---
 
 
 def test_real_chunks_fit_in_embedding_window():
