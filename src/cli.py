@@ -160,6 +160,15 @@ def publish_due(
         console.print(f"[green]Publié[/green] {post.id} → " + ", ".join(f"{c}: {i}" for c, i in channels.items()))
 
 
+@app.command()
+def ui(port: int = typer.Option(8765, help="Port local de l'interface web.")) -> None:
+    """Lance l'interface web (http://localhost:8765)."""
+    import uvicorn
+
+    console.print(f"[green]Interface web :[/green] http://localhost:{port}  (Ctrl+C pour arrêter)")
+    uvicorn.run("src.web.app:app", host="127.0.0.1", port=port, log_level="warning")
+
+
 @app.command("list")
 def list_command(statut: Status = typer.Option(None, help="Filtrer par statut.")) -> None:
     """Liste les posts et leur statut."""

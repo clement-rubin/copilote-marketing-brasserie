@@ -78,6 +78,7 @@ flowchart LR
 | `src/publish.py`, `src/social.py`, `src/orchestrate.py` | Calendrier, publication (mock et API réelles), flux hebdomadaire |
 | `src/demo.py` | Réponses du mode démo (sans LLM) |
 | `src/cli.py` | Interface en ligne de commande |
+| `src/web/` | Interface web : API REST FastAPI + page HTML/CSS/JS |
 
 Le design initial est dans [docs/superpowers/specs/](docs/superpowers/specs/2026-10-13-copilote-marketing-design.md).
 
@@ -97,7 +98,27 @@ cp .env.example .env             # Windows : copy .env.example .env
 
 Par défaut, tout tourne **sans clé API ni réseau** (`LLM_PROVIDER=fake`, `IMAGE_PROVIDER=placeholder`, `PUBLISH_MODE=mock`), hors téléchargement initial du modèle d'embedding (environ 470 Mo).
 
-Démo guidée de toute la chaîne (Windows) : `powershell -ExecutionPolicy Bypass -File demo.ps1`
+### Interface web
+
+```bash
+python -m src.cli ui        # puis ouvrir http://localhost:8765
+```
+
+Une interface complète, conçue comme le **registre d'un brasseur** (papier kraft, encre vert bouteille, statuts en tampons d'étiquette) :
+
+| Vue | Ce qu'on y fait |
+|---|---|
+| **Tableau de bord** | compteurs par statut, prochaines publications, tendances du marché, bouton « Lancer la semaine » |
+| **Veille & tendances** | veille démo ou réelle, tendances, mots-clés et concurrents suivis, revue de presse résumée |
+| **Atelier de contenu** | choix de l'article de départ et des personas, rédaction des posts avec visuels |
+| **Revue** | approuver, rejeter, éditer chaque post ; sources, avertissements du garde-fou, jauge de confiance, prompt d'image à copier |
+| **Calendrier** | 4 semaines de créneaux (2 LinkedIn + 1 Instagram), programmation, publication simulée à une date choisie |
+| **Base de connaissances** | questions-réponses sourcées sur la documentation de la marque |
+| **Contrôle qualité** | mini-évaluation sur 10 cas et test des détecteurs, en un clic |
+
+Côté technique : une **API REST FastAPI** (`src/web/app.py`, documentation automatique sur `/docs`) qui appelle exactement les mêmes fonctions que la CLI, et une page HTML/CSS/JavaScript sans framework (`src/web/static/`). Tout texte venant de l'API est inséré avec `textContent`, jamais `innerHTML` : pas d'injection HTML possible. Usage local, mono-utilisateur, sans authentification.
+
+Démo guidée de toute la chaîne en ligne de commande (Windows) : `powershell -ExecutionPolicy Bypass -File demo.ps1`
 
 ## Utilisation
 
@@ -158,7 +179,7 @@ PUBLISH_MODE=live              # + tokens LinkedIn / Meta, voir plus bas
 ### Tests et évaluation
 
 ```bash
-python -m pytest            # 71 tests, sans réseau ni clé (API sociales simulées par un faux transport HTTP)
+python -m pytest            # 76 tests, sans réseau ni clé (API sociales simulées, API web via TestClient)
 python -m tests.eval        # mini-évaluation sur 10 cas avec le LLM configuré
 ```
 
@@ -279,7 +300,7 @@ Les publishers de `src/social.py` sont écrits d'après la documentation officie
 - **A/B testing** : générer deux accroches par post et alterner.
 - **Vérification au niveau des affirmations** : un juge LLM ou un modèle NLI qui vérifie chaque phrase contre les passages.
 - **Retrieval** : recherche hybride (BM25 + vecteurs), reranker, modèle d'embedding à fenêtre plus longue.
-- **Interface de revue** (Streamlit ou petite app web) pour l'équipe, avec notifications (mail, Slack) quand les brouillons de la semaine sont prêts.
+- **Interface multi-utilisateur** : authentification, rôles (rédaction, direction), notifications (mail, Slack) quand les brouillons de la semaine sont prêts.
 - **Images** : hébergement automatique des visuels validés (stockage objet) pour fournir l'URL publique à Instagram.
 
 ## Structure du dépôt
@@ -291,7 +312,7 @@ copilote-marketing/
   data/demo_feed.xml     flux fictif pour la démo hors ligne
   prompts/               prompts versionnés et commentés
   src/                   code (voir le tableau des modules)
-  tests/                 71 tests + eval.py
+  tests/                 76 tests + eval.py
   out/examples/          exemples de sortie (2 LinkedIn, 1 Instagram, 1 programmation)
   demo.ps1               démo guidée
   docs/                  spec de design

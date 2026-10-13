@@ -11,4 +11,6 @@ typer>=0.12              # CLI
 rich>=13.7               # tableaux dans le terminal
 python-dotenv>=1.0       # lecture du fichier .env
 pyyaml>=6.0              # lecture de feeds.yaml
+fastapi>=0.110           # API de l'interface web
+uvicorn>=0.29           # serveur de l'interface web
 pytest>=8.0
