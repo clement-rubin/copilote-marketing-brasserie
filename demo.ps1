@@ -1,5 +1,5 @@
 ﻿# Démo de bout en bout du Copilote Marketing (mode démo, sans clé API).
-# Lancement : .\demo.ps1   (depuis le dossier du projet)
+# Lancement : powershell -ExecutionPolicy Bypass -File demo.ps1
 
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
@@ -17,32 +17,41 @@ function Pause-Demo {
 }
 
 # Repart d'un état propre (les sorties de démo sont dans out/, ignoré par git)
-Remove-Item -Recurse -Force out\posts, out\watch, out\scheduled -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force out\posts, out\watch, out\scheduled, out\published, out\images -ErrorAction SilentlyContinue
 
-Step "1. Ingestion des documents de marque dans ChromaDB"
+Step "1. Base de connaissances : ingestion des documents de marque (RAG)"
 & $py -m src.cli ingest
 Pause-Demo
 
-Step "2. Veille RSS sur le flux fictif (résumé + déduplication)"
-& $py -m src.cli watch --offline
+Step "2. Base de connaissances interrogeable"
+& $py -m src.cli ask "Quel est le degré de la Saison Démo ?"
+& $py -m src.cli ask "Quel est le prix de la Blonde ?"
 Pause-Demo
 
-Step "3. Génération : 3 posts LinkedIn + 1 Instagram à partir du 1er article"
-& $py -m src.cli generate --articles 1
+Step "3. Flux hebdomadaire : veille + 3 brouillons (2 LinkedIn + 1 Instagram) + visuels"
+& $py -m src.cli weekly --offline
 Pause-Demo
 
-Step "4. File de validation humaine (tout est en brouillon)"
+Step "4. Social listening : tendances et mentions des concurrents"
+& $py -m src.cli trends --top 8
+Pause-Demo
+
+Step "5. Validation humaine (a = approuver, r = rejeter, e = éditer, p = passer, q = quitter)"
 & $py -m src.cli list
-Write-Host "Validation interactive : a = approuver, r = rejeter, e = éditer, p = passer, q = quitter" -ForegroundColor Yellow
 & $py -m src.cli review
 
-Step "5. Programmation des posts approuvés (2 LinkedIn + 1 Instagram / semaine)"
+Step "6. Programmation des posts approuvés (calendrier 2 LinkedIn + 1 Instagram / semaine)"
 & $py -m src.cli schedule
+Pause-Demo
+
+Step "7. Publication des posts arrivés à échéance (simulation dans 30 jours, mode mock)"
+& $py -m src.cli publish-due --at (Get-Date).AddDays(30).ToString("yyyy-MM-dd")
 & $py -m src.cli list
 Pause-Demo
 
-Step "6. Mini-évaluation sur 10 cas"
+Step "8. Mini-évaluation sur 10 cas"
 & $py -m tests.eval
 
 Write-Host ""
-Write-Host "Fichiers produits : out\posts, out\scheduled. Détail d'un post : python -m src.cli show <id>" -ForegroundColor Green
+Write-Host "Fichiers produits : out\posts, out\images (visuels), out\scheduled, out\published." -ForegroundColor Green
+Write-Host "Détail d'un post : .venv\Scripts\python -m src.cli show <id>" -ForegroundColor Green

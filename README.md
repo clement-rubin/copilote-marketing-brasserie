@@ -1,14 +1,43 @@
-# Copilote Marketing : RAG + LLM pour une brasserie artisanale bio
+# Copilote Marketing : IA générative + RAG + automatisation social media
 
-MVP de démonstration d'un **copilote marketing** pour une brasserie artisanale bio. Il :
+MVP réalisé pour la candidature au stage **« Ingénieur(e) IA Générative & Automatisation Social Media »** : une *Content Factory* pour une brasserie artisanale de bières de spécialité certifiées bio, sur le marché franco-belge.
 
-1. **surveille l'actualité du marché** via des flux RSS (bière, brasserie artisanale, bio, CHR) et résume chaque article ;
-2. **génère des posts LinkedIn (B2B) et Instagram (B2C)** fidèles au ton de la marque, en s'appuyant sur un **RAG** comme seule source de faits ;
-3. **refuse d'inventer** : chaque chiffre et chaque label est vérifié par un garde-fou déterministe ;
-4. fait passer chaque post par une **validation humaine**, puis le **programme** (2 LinkedIn + 1 Instagram par semaine) ;
-5. propose un **prompt d'image** cohérent avec la marque pour chaque post.
+Le copilote :
 
-> **Toutes les données de marque sont fictives.** La « Brasserie Démo du Hainaut », son brasseur, ses bières, ses partenaires et le flux de démonstration sont inventés pour ce projet. Seules les informations générales sur la réglementation bio européenne sont réelles, et elles sont résumées.
+1. **écoute le marché** (social listening) : flux RSS de la filière, recherches Google News sur des mots-clés (« bière bio CHR ») et sur les **concurrents**, analyse des tendances ;
+2. s'appuie sur une **base de connaissances propriétaire (RAG)** (histoire, fiches techniques, labels bio, charte éditoriale, interview), interrogeable directement ;
+3. **génère chaque semaine 3 posts** (2 LinkedIn B2B pour cavistes, distributeurs et CHR, 1 Instagram B2C pour les amateurs de craft beer) avec des personas, dans le ton de la marque ;
+4. **refuse d'inventer** : chaque chiffre et chaque label est vérifié par un garde-fou ;
+5. produit le **visuel** de chaque post (prompt Midjourney / DALL-E, génération via l'API OpenAI ou maquette hors ligne) ;
+6. passe par une **validation humaine**, puis **programme et publie** via les API natives (LinkedIn, Instagram, Facebook) ou en simulation.
+
+> **Toutes les données de marque sont fictives** (« Brasserie Démo du Hainaut », son brasseur, ses bières, ses partenaires, le flux de démo). Aucun fait n'est inventé sur une marque réelle. Pour l'adapter à une vraie brasserie, il suffit de remplacer les documents de `data/brand/` puis de lancer `ingest`.
+
+---
+
+## Correspondance avec l'offre
+
+| Mission de l'offre | Implémentation | Commande |
+|---|---|---|
+| **Veille & social listening** : tendances du marché brassicole, mots-clés des concurrents, actualités CHR/bio | `src/watch.py` (RSS + Google News RSS générés depuis `listening` dans `data/feeds.yaml`), `src/trends.py` (termes fréquents, mentions des mots-clés et concurrents), résumé en 3 phrases + pertinence par le LLM | `watch`, `trends` |
+| **Architecture RAG** : base de connaissances propriétaire interrogeable par un LLM | `src/ingest.py` (chunks, embeddings, ChromaDB), `src/rag.py` (top-k + sources), `src/qa.py` (questions-réponses sourcées) | `ingest`, `ask` |
+| **Prompt engineering** : posts LinkedIn B2B, légendes Instagram B2C | `prompts/*.md` versionnés et commentés, 3 personas LinkedIn (Expertise Bio, Coulisses du Brassage, Mise en avant d'un distributeur) + 1 persona Instagram, sortie validée par pydantic | `generate` |
+| **Génération multimodale** (Midjourney, DALL-E 3) | `src/images.py` (prompt par gabarit : style, palette, composition, interdits, ligne Midjourney), `src/visuals.py` (DALL-E 3 / gpt-image via API, maquette SVG hors ligne) | `visual` |
+| **Orchestration & workflow** : publication via API natives | `src/orchestrate.py` (3 posts / semaine), `src/publish.py` (calendrier, `publish-due`), `src/social.py` (LinkedIn Posts API, Instagram Graph API, page Facebook) | `weekly`, `schedule`, `publish-due` |
+| **API OpenAI, Anthropic** | `src/llm.py` : interface `LLMClient`, implémentations OpenAI, Anthropic et Gemini, faux client pour les tests | `LLM_PROVIDER` |
+| **Respect du ton de la marque** | charte éditoriale dans le RAG et dans le prompt système, mots interdits contrôlés par `src/guard.py`, mini-évaluation | `python -m tests.eval` |
+
+### Le cahier des charges sur 12 semaines, déjà prototypé
+
+| Période | Livrable demandé | État dans ce MVP |
+|---|---|---|
+| Mois 1, S1-2 | « Brand Book » IA vectorisé, RAG qui répond uniquement à partir des documents | ✅ `ingest` + `ask`, garde-fou sur les chiffres |
+| Mois 1, S3-4 | Scripts de veille (flux RSS, Google News « bière bio CHR »), résumés | ✅ `watch` + `trends` |
+| Mois 2, S1-2 | Prompt engineering LinkedIn B2B, personas | ✅ 3 personas + Instagram, `generate` |
+| Mois 2 | Multimodalité texte + image | ✅ prompts d'images + `visual` (OpenAI ou maquette) |
+| Mois 3 | Programmation et publication automatisées, 3 posts par semaine | ✅ `weekly` + `schedule` + `publish-due` (simulation testée, API réelles prêtes à brancher) |
+
+Ce qu'il resterait à faire pendant le stage : brancher la vraie documentation de la marque, obtenir la validation des applications LinkedIn et Meta, choisir le LLM avec la direction, puis affiner les prompts sur les retours de l'équipe et l'engagement réel (voir les pistes d'amélioration).
 
 ---
 
@@ -16,41 +45,41 @@ MVP de démonstration d'un **copilote marketing** pour une brasserie artisanale 
 
 ```mermaid
 flowchart LR
-    F[data/feeds.yaml<br/>flux RSS] --> W[watch.py<br/>RSS + résumé LLM<br/>dédup par URL]
-    W --> A[(out/watch/<br/>articles.json)]
-    B[data/brand/*.md<br/>documents fictifs] --> I[ingest.py<br/>chunks 120 tokens<br/>+ embeddings]
-    I --> C[(ChromaDB)]
-    A --> G[generate.py<br/>persona + prompts/*.md]
-    C --> R[rag.py<br/>top-k + sources] --> G
-    G --> L{{LLMClient<br/>Gemini · Anthropic<br/>OpenAI stub · Fake}}
-    L --> G
+    F[feeds.yaml<br/>flux RSS + mots-clés<br/>+ concurrents] --> W[watch.py<br/>RSS / Google News<br/>résumé LLM, dédup]
+    W --> A[(articles.json)]
+    A --> T[trends.py<br/>tendances,<br/>mentions concurrents]
+    B[data/brand/*.md] --> I[ingest.py<br/>chunks 120 tokens<br/>embeddings] --> C[(ChromaDB)]
+    C --> R[rag.py<br/>top-k + sources]
+    R --> Q[qa.py<br/>ask]
+    A --> G[generate.py<br/>personas<br/>prompts/*.md]
+    R --> G
+    G <--> L{{LLMClient<br/>OpenAI · Anthropic<br/>Gemini · Fake}}
     G --> V[guard.py<br/>chiffres / labels<br/>non sourcés]
-    V --> IMG[images.py<br/>prompt d'image]
-    IMG --> P[(out/posts/<br/>statut brouillon)]
-    P --> RV[review.py<br/>approuver · rejeter · éditer]
-    RV --> S[publish.py<br/>calendrier + MockPublisher]
-    S --> O[(out/scheduled/)]
+    V --> IM[images.py + visuals.py<br/>prompt + visuel]
+    IM --> P[(posts<br/>brouillon)]
+    O[orchestrate.py<br/>weekly : 3 posts] --> G
+    P --> RV[review.py<br/>validation humaine]
+    RV --> S[publish.py<br/>calendrier 2 LI + 1 IG]
+    S --> PD[publish-due<br/>cron]
+    PD --> SO[social.py<br/>LinkedIn · Instagram<br/>Facebook · Mock]
 ```
 
 | Module | Rôle |
 |---|---|
-| `src/config.py` | Chemins du projet, lecture du `.env` |
-| `src/models.py` | Modèles pydantic : sortie du LLM (`PostDraft`) séparée du post stocké (`Post`), statuts et transitions |
-| `src/llm.py` | Interface `LLMClient` + implémentations, `complete_json` (extraction JSON, validation, 1 retry) |
-| `src/prompts.py` + `prompts/*.md` | Prompts versionnés et commentés (les commentaires ne sont pas envoyés au LLM) |
-| `src/ingest.py` | Découpage des documents de marque, vectorisation, ChromaDB |
-| `src/rag.py` | Retrieval top-k, filtre par type de document, citation des sources |
-| `src/watch.py` | Veille RSS, résumé en 3 phrases + pertinence, déduplication par URL |
-| `src/generate.py` | Génération des posts par persona |
-| `src/guard.py` | Garde-fou anti-hallucination et contrôle de forme |
-| `src/images.py` | Prompts d'images (Midjourney / DALL-E), sans appel d'API |
-| `src/store.py` | Stockage JSON des posts |
-| `src/review.py` | File de validation humaine |
-| `src/publish.py` | Interface `Publisher`, `MockPublisher`, calendrier |
+| `src/config.py` | Chemins, lecture du `.env` |
+| `src/models.py` | Modèles pydantic : sortie du LLM (`PostDraft`, `Answer`, `ArticleSummary`) séparée du post stocké (`Post`), statuts et transitions |
+| `src/llm.py` | Interface `LLMClient`, implémentations, `complete_json` (extraction JSON, validation, 1 retry) |
+| `src/prompts.py` + `prompts/` | Prompts versionnés et commentés |
+| `src/ingest.py`, `src/rag.py`, `src/qa.py` | RAG : indexation, retrieval, questions-réponses |
+| `src/watch.py`, `src/trends.py` | Veille, social listening, tendances |
+| `src/generate.py`, `src/guard.py` | Génération par persona, garde-fou anti-hallucination |
+| `src/images.py`, `src/visuals.py` | Prompts d'images, génération des visuels |
+| `src/store.py`, `src/review.py` | Stockage JSON, validation humaine |
+| `src/publish.py`, `src/social.py`, `src/orchestrate.py` | Calendrier, publication (mock et API réelles), flux hebdomadaire |
 | `src/demo.py` | Réponses du mode démo (sans LLM) |
-| `src/cli.py` | Commandes `ingest`, `watch`, `generate`, `list`, `show`, `review`, `schedule`, `export` |
+| `src/cli.py` | Interface en ligne de commande |
 
-Le design détaillé est dans [docs/superpowers/specs/2026-10-13-copilote-marketing-design.md](docs/superpowers/specs/2026-10-13-copilote-marketing-design.md).
+Le design initial est dans [docs/superpowers/specs/](docs/superpowers/specs/2026-10-13-copilote-marketing-design.md).
 
 ---
 
@@ -66,53 +95,80 @@ pip install -r requirements.txt
 cp .env.example .env             # Windows : copy .env.example .env
 ```
 
-Par défaut, `LLM_PROVIDER=fake` : **tout fonctionne sans clé API ni réseau** (hors téléchargement initial du modèle d'embedding, environ 470 Mo).
+Par défaut, tout tourne **sans clé API ni réseau** (`LLM_PROVIDER=fake`, `IMAGE_PROVIDER=placeholder`, `PUBLISH_MODE=mock`), hors téléchargement initial du modèle d'embedding (environ 470 Mo).
+
+Démo guidée de toute la chaîne (Windows) : `powershell -ExecutionPolicy Bypass -File demo.ps1`
 
 ## Utilisation
 
 ```bash
-python -m src.cli ingest                     # indexe data/brand/ dans ChromaDB
-python -m src.cli watch --offline            # veille sur le flux fictif (sans --offline : vrais flux RSS)
-python -m src.cli generate --articles 1      # 4 brouillons : 3 personas LinkedIn + 1 Instagram
-python -m src.cli list                       # liste les posts et leur statut
-python -m src.cli show <id>                  # post complet + sources + avertissements + prompt d'image
-python -m src.cli review                     # validation interactive (a/r/e/p/q)
-python -m src.cli review --approve <id> --reject <id> --note "..."   # validation non interactive
-python -m src.cli review --edit <id> --text "nouveau texte"         # édition (repasse en brouillon)
-python -m src.cli schedule                   # programme les posts approuvés
-python -m src.cli export <id> <id>           # export markdown dans out/examples/
+# Mois 1 : contexte et sourcing
+python -m src.cli ingest                                   # indexe data/brand/ dans ChromaDB
+python -m src.cli ask "Quel est le degré de la Saison Démo ?"   # question à la base de connaissances
+python -m src.cli watch                                    # veille réelle (ou --offline : flux fictif)
+python -m src.cli trends                                   # tendances + mentions des concurrents
+
+# Mois 2 : Content Factory
+python -m src.cli generate --articles 1                    # 4 brouillons (toutes les personas)
+python -m src.cli visual <id>                              # visuel du post (IMAGE_PROVIDER)
+python -m src.cli show <id>                                # post complet, sources, avertissements, prompt d'image
+
+# Mois 3 : orchestration
+python -m src.cli weekly                                   # veille + 3 brouillons de la semaine + visuels
+python -m src.cli review                                   # validation interactive (a/r/e/p/q)
+python -m src.cli schedule                                 # programme les posts approuvés
+python -m src.cli publish-due                              # publie ce qui est arrivé à échéance
+python -m src.cli list                                     # état de tous les posts
+python -m src.cli export <id> <id>                         # export markdown pour l'équipe
 ```
 
-Options utiles : `generate --persona expertise_bio --persona instagram_craft`, `list --statut approuve`.
+Autres options : `review --approve <id> --reject <id> --note "..."`, `review --edit <id> --text "..."`, `visual <id> --url https://...` (URL publique du visuel, exigée par Instagram), `publish-due --live`, `publish-due --at 2026-12-31` (simulation).
 
-Démo guidée de toute la chaîne, avec des pauses (Windows) : `powershell -ExecutionPolicy Bypass -File demo.ps1`
+### Automatisation
 
-### Utiliser un vrai LLM
+Deux jobs suffisent : un passage hebdomadaire de veille et génération, puis un passage fréquent de publication. Entre les deux, la revue humaine reste obligatoire.
 
-Gemini (quota gratuit) : créer une clé sur [Google AI Studio](https://aistudio.google.com/apikey), puis dans `.env` :
+```bash
+# cron (Linux / macOS)
+0 8 * * 1    cd /chemin/copilote-marketing && .venv/bin/python -m src.cli weekly
+*/15 * * * * cd /chemin/copilote-marketing && .venv/bin/python -m src.cli publish-due
+```
+
+```bat
+:: Planificateur de tâches Windows
+schtasks /Create /SC WEEKLY /D MON /ST 08:00 /TN "Copilote weekly" /TR "cmd /c cd /d C:\dev\copilote-marketing && .venv\Scripts\python -m src.cli weekly"
+schtasks /Create /SC MINUTE /MO 15 /TN "Copilote publication" /TR "cmd /c cd /d C:\dev\copilote-marketing && .venv\Scripts\python -m src.cli publish-due"
+```
+
+Les mêmes commandes peuvent être appelées depuis n8n ou Make (nœud « Execute Command ») si l'équipe préfère un outil visuel.
+
+### Brancher les vrais fournisseurs
+
+Dans `.env` :
 
 ```ini
-LLM_PROVIDER=gemini
-GEMINI_API_KEY=...
-GEMINI_MODEL=gemini-2.5-flash
+LLM_PROVIDER=openai            # ou anthropic, gemini (quota gratuit sur Google AI Studio)
+OPENAI_API_KEY=...
+OPENAI_MODEL=...               # jamais écrit en dur dans le code
+IMAGE_PROVIDER=openai
+IMAGE_MODEL=dall-e-3           # ou gpt-image-1
+PUBLISH_MODE=live              # + tokens LinkedIn / Meta, voir plus bas
 ```
-
-Anthropic : `LLM_PROVIDER=anthropic`, `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`. Le nom du modèle n'est jamais écrit en dur dans le code.
 
 ### Tests et évaluation
 
 ```bash
-python -m pytest            # 52 tests, sans réseau ni clé (mode démo + vrai modèle d'embedding)
-python -m tests.eval        # mini-évaluation sur 10 cas, avec le LLM configuré
+python -m pytest            # 71 tests, sans réseau ni clé (API sociales simulées par un faux transport HTTP)
+python -m tests.eval        # mini-évaluation sur 10 cas avec le LLM configuré
 ```
 
 ---
 
 ## Exemple de sortie
 
-> Les exemples de [`out/examples/`](out/examples/) ont été produits par la vraie chaîne (`watch --offline` → `generate` → `review` → `schedule` → `export`) en **mode démo** : le « LLM » est le `FakeLLMClient`, qui assemble des phrases tirées des passages RAG. Le style est donc plus plat qu'avec un vrai modèle, mais les sorties passent par exactement le même code : parsing JSON, validation pydantic, garde-fou, prompt d'image, validation, programmation. Avec une clé Gemini, la même commande produit des textes rédigés par le modèle.
+> Les exemples de [`out/examples/`](out/examples/) ont été produits par la vraie chaîne (`watch --offline` → `generate` → `review` → `schedule` → `export`) en **mode démo** : le « LLM » est le `FakeLLMClient`, qui assemble des phrases tirées des passages RAG. Le style est plus plat qu'avec un vrai modèle, mais les sorties passent par exactement le même code : parsing JSON, validation pydantic, garde-fou, prompt d'image, validation, programmation.
 
-Post LinkedIn, persona « Expertise Bio » ([fichier complet](out/examples/)) :
+Post LinkedIn, persona « Expertise Bio » :
 
 ```text
 Le logo bio, tout le monde le connaît. Ce qu'il garantit, beaucoup moins.
@@ -130,16 +186,18 @@ Vous êtes caviste ou restaurateur ? Quelle question vos clients vous posent-ils
 Sources : 06_labels_bio.md · Confiance : 0.60 · Statut : programmé mar. 20/10/2026 09h00
 ```
 
-Programmation produite par `schedule` :
+Base de connaissances (`ask`) :
 
 ```text
-┌───────────────────────┬────────────┬──────────┬──────────────────────────────────────────────────┐
-│ date                  │ plateforme │ id       │ début du texte                                   │
-├───────────────────────┼────────────┼──────────┼──────────────────────────────────────────────────┤
-│ mar. 20/10/2026 09h00 │ linkedin   │ 5a49c62f │ Le logo bio, tout le monde le connaît. Ce qu'il… │
-│ jeu. 22/10/2026 09h00 │ linkedin   │ 62434694 │ Une bière ne se vend pas toute seule. Merci à c… │
-│ sam. 24/10/2026 11h00 │ instagram  │ 07d9caf8 │ Petite pause dégustation à la grange 🍻 Aujourd… │
-└───────────────────────┴────────────┴──────────┴──────────────────────────────────────────────────┘
+Q : Quel est le degré de la Saison Démo ?     → Degré d'alcool : 5,8 % vol.  (05_fiche_saison_demo.md)
+Q : Quel est le prix de la Blonde ?           → Je ne trouve pas cette information dans la documentation.
+```
+
+Social listening (`trends`, flux de démo) :
+
+```text
+terme suivi          type         mentions   exemple
+Brasserie Exemple    concurrent   1          La Brasserie Exemple lance une bière bio au sureau…
 ```
 
 Mini-évaluation (`python -m tests.eval`, mode démo) :
@@ -159,92 +217,82 @@ superlatifs + santé + émojis  Formule interdite : « meilleure bière », « i
 
 | Choix | Pourquoi |
 |---|---|
-| **Pas de LangChain** | Les besoins se limitent à découper, vectoriser, interroger et faire un appel LLM. Les appels directs à ChromaDB et aux SDK font moins de code, moins de dépendances, et chaque ligne s'explique. |
-| **Interface `LLMClient`** | Le reste du code n'appelle que `complete()`. Changer de fournisseur revient à changer une variable d'environnement. Gemini et Anthropic sont implémentés, OpenAI est un stub documenté. |
-| **`FakeLLMClient` + mode démo** | Les tests ne coûtent rien, ne dépendent pas du réseau et sont déterministes. La démo tourne sans clé. |
-| **Embeddings locaux** (`paraphrase-multilingual-MiniLM-L12-v2`) | Gratuit, hors ligne, multilingue (documents en français, flux en anglais), aucune donnée de marque envoyée à un tiers pour l'indexation. |
-| **Chunks de 120 tokens**, chevauchement 30 | Ce modèle **tronque à 128 tokens** : avec des chunks de 500 tokens, les trois quarts du texte ne seraient pas vectorisés. On compte avec le tokenizer du modèle lui-même, on découpe par section markdown puis par phrase, et on préfixe chaque chunk par « Document > Section ». |
-| **ChromaDB** | Base vectorielle embarquée et persistante, rien à installer. On fournit nos propres embeddings : on maîtrise le modèle. |
-| **Charte exclue des sources de faits** | Elle contient des exemples de « mauvais posts » : ils ne doivent jamais servir de source. Le ton est donné par le prompt système. |
-| **pydantic, deux modèles distincts** | `PostDraft` = ce que le LLM a le droit de produire. `Post` ajoute ce que seul le code contrôle (id, statut, dates). Le LLM ne peut pas s'auto-approuver. |
-| **Prompts dans `prompts/*.md`** | Versionnés avec le code, commentés (`<!-- -->`, non envoyés), relisibles par l'équipe marketing sans lire de Python. |
-| **Garde-fou déterministe** | Le prompt réduit les hallucinations, le code les attrape. Voir ci-dessous. |
-| **Prompts d'image par gabarit** | Une direction artistique doit être stable : même palette et mêmes interdits à chaque post, sans coût ni variabilité. |
-| **Stockage JSON** | Lisible, versionnable, suffisant pour un MVP mono-utilisateur. |
-| **RSS uniquement** | Pas de scraping : on ne lit que ce que l'éditeur publie volontairement en flux. Le LLM résume le titre et l'extrait RSS, la page n'est jamais téléchargée. |
+| **Appels directs plutôt que LangChain** | L'offre cite LangChain à titre d'exemple. Ici, les besoins se limitent à découper, vectoriser, interroger et faire un appel LLM : sans framework, il y a moins de dépendances et de couches, et chaque ligne s'explique. L'interface `LLMClient` joue le rôle d'abstraction. LangChain se justifierait pour des agents ou des chaînes plus complexes. |
+| **ChromaDB plutôt que Pinecone** | Embarquée, persistante, gratuite, rien à héberger : adaptée à quelques centaines de documents. Pinecone devient pertinent pour un volume ou un accès multi-utilisateur plus important. Seuls `ingest.py` et `rag.py` seraient à adapter. |
+| **Interface `LLMClient`** | OpenAI, Anthropic et Gemini sont interchangeables par une variable d'environnement, avec un faux client pour des tests gratuits et déterministes. On n'est pas lié à un fournisseur. |
+| **Embeddings locaux** (`paraphrase-multilingual-MiniLM-L12-v2`) | Gratuit, hors ligne, multilingue (documents en français, veille en anglais), aucune donnée interne envoyée à un tiers pour l'indexation. |
+| **Chunks de 120 tokens**, chevauchement 30 | Ce modèle **tronque à 128 tokens** : avec des chunks de 500 tokens, les trois quarts du texte ne seraient pas vectorisés. Le comptage utilise le tokenizer du modèle. Le découpage se fait par section markdown puis par phrase, et chaque chunk est préfixé par « Document > Section ». |
+| **RSS et API plutôt que scraping** | L'offre parle de « Scraping/API ». J'ai retenu les flux RSS et Google News RSS, publiés volontairement par les éditeurs. Le scraping de pages pose des questions de CGU, de droit d'auteur et de RGPD, et casse à chaque changement de site. Si un scraper devenait nécessaire, il respecterait `robots.txt`, un délai entre requêtes et les CGU du site. |
+| **Charte exclue des sources de faits** | Elle contient des exemples de « mauvais posts » : ils ne doivent jamais servir de source. Le ton passe par le prompt système. |
+| **Deux familles de modèles pydantic** | `PostDraft` = ce que le LLM a le droit de produire. `Post` ajoute ce que seul le code contrôle (id, statut, dates). Le LLM ne peut pas s'auto-approuver ni s'auto-publier. |
+| **Prompts dans `prompts/*.md`** | Versionnés, commentés, relisibles par l'équipe marketing sans lire de Python. |
+| **Prompts d'images par gabarit** | Une direction artistique stable : même palette et mêmes interdits à chaque post. L'API d'images ne fait que l'exécuter. |
+| **Midjourney** | Pas d'API publique officielle : le prompt contient une ligne « Midjourney : ... » à coller dans l'outil. |
+| **Publication en deux jobs** (`schedule` puis `publish-due`) | Les API LinkedIn et Instagram ne programment pas les posts elles-mêmes. Notre calendrier est la source de vérité, et un job publie à l'échéance. Un échec est retenté sans republier les canaux déjà réussis. |
 
 ### Anti-hallucination, en trois couches
 
 1. **Prompt** ([prompts/system.md](prompts/system.md)) : les passages sont étiquetés `[source: fichier]`, et toute information manquante doit aller dans `avertissements`.
-2. **Code** ([src/guard.py](src/guard.py)), après génération :
-   - chaque **nombre** du post (degré, %, année, volume) doit apparaître dans les passages RAG ou l'article fourni ;
-   - chaque **label** connu (Eurofeuille, Biogarantie, Demeter…) doit apparaître dans le contexte ;
-   - **formules interdites** par la charte (superlatifs, allégations santé) ;
-   - **sources inventées** (fichiers non fournis) retirées et signalées ;
-   - chaque problème de fond ajoute un avertissement et retire 0,2 au score de confiance.
+2. **Code** ([src/guard.py](src/guard.py)) : chaque **nombre** et chaque **label** du texte doit figurer dans le contexte fourni. Le code contrôle aussi les **formules interdites** par la charte, les **sources inventées** (retirées) et la **forme** (longueur, hashtags, émojis). Chaque problème de fond ajoute un avertissement et baisse le score de confiance.
 3. **Humain** : tout post naît brouillon. Seuls les posts approuvés sont programmables, et toute édition renvoie le post en brouillon après une nouvelle vérification.
 
-Le contexte complet fourni au LLM est enregistré dans le post (`contexte`) : on peut auditer chaque affirmation après coup.
+Le contexte complet fourni au LLM est enregistré dans chaque post : chaque affirmation peut être auditée après coup.
 
 ---
 
-## Brancher les vraies API sociales
+## API sociales : ce qui est prêt, ce qu'il faut obtenir
 
-`MockPublisher` écrit dans `out/scheduled/`. Pour publier vraiment, il suffit d'écrire une classe `LinkedInPublisher(Publisher)` ou `InstagramPublisher(Publisher)`, sans toucher au reste. Côté plateformes, voici ce qu'il faudrait (à vérifier dans la documentation officielle, ces conditions évoluent souvent).
+Les publishers de `src/social.py` sont écrits d'après la documentation officielle et testés avec un faux transport HTTP. Ils n'ont **pas** été appelés contre les vraies API : il faut pour cela des applications validées par LinkedIn et Meta. À revalider avant la mise en production, car les deux plateformes versionnent leurs API.
 
 ### LinkedIn (page entreprise)
 
-- **Application** créée sur le LinkedIn Developer Portal et **associée à la page** de la brasserie (vérification par un administrateur de la page).
-- **Accès au produit « Community Management API »**, soumis à une demande et à une revue par LinkedIn (palier de développement, puis palier standard).
-- **OAuth 2.0** (3-legged) avec un compte administrateur de la page, scope `w_organization_social` (et `r_organization_social` pour lire).
-- Publication via la **Posts API** (`POST /rest/posts`, en-têtes `LinkedIn-Version` et `X-Restli-Protocol-Version: 2.0.0`). Les images s'envoient d'abord via l'Images API.
-- **Tokens** à durée limitée, à renouveler (refresh token selon le programme), et à stocker hors du code (coffre à secrets).
-- **Limites de débit** quotidiennes par application et par membre, visibles dans le portail développeur.
-- Pas de programmation native via l'API : notre `schedule` reste la source de vérité, et un job (cron, file de tâches) publie à l'heure prévue.
+- Application sur le LinkedIn Developer Portal, **associée à la page** de la brasserie (vérifiée par un administrateur).
+- Accès au produit **Community Management API** : demande et revue par LinkedIn.
+- **OAuth 2.0** avec un administrateur de la page, scope `w_organization_social`.
+- Implémenté : `POST /rest/posts` avec les en-têtes `LinkedIn-Version` et `X-Restli-Protocol-Version: 2.0.0`, échappement du *little text format*, hashtags au format LinkedIn. À ajouter : l'envoi d'image (Images API).
+- **Tokens** à durée limitée à renouveler, à stocker dans un coffre à secrets. **Quotas** quotidiens visibles dans le portail.
 
-### Instagram (Meta)
+### Instagram et Facebook (Meta)
 
-- **Compte Instagram professionnel** (Business ou Créateur). Selon l'API choisie, il doit aussi être relié à une **page Facebook** (Instagram Graph API avec Facebook Login) ou passer par l'API « Instagram Login ».
-- **Application Meta** avec **App Review** pour les permissions de publication (ex. `instagram_content_publish` / `instagram_business_content_publish`), et souvent la **vérification de l'entreprise**.
-- Publication en deux temps : création d'un *media container* (`POST /{ig-user-id}/media` avec `image_url` publique et `caption`), puis `POST /{ig-user-id}/media_publish`. **L'image doit donc être hébergée à une URL publique.**
-- **Quota de publications par 24 h glissantes**, consultable via l'endpoint `content_publishing_limit`, en plus des limites de débit de la Graph API.
-- **Tokens longue durée** (environ 60 jours) à rafraîchir.
+- **Compte Instagram professionnel** relié à une **page Facebook** (ou API « Instagram Login »).
+- **Application Meta**, **App Review** des permissions de publication (`instagram_content_publish` ou `instagram_business_content_publish`, et les permissions de page pour Facebook), souvent avec **vérification de l'entreprise**.
+- Implémenté : publication Instagram en deux temps (`/{ig-user-id}/media` puis `/media_publish`) ; l'image doit être à une **URL publique** (`visual <id> --url ...`). Relais facultatif sur la page Facebook (`/{page-id}/feed` ou `/photos`).
+- **Quota de publications par 24 h glissantes** (endpoint `content_publishing_limit`), limites de débit de la Graph API, **tokens longue durée** à rafraîchir.
 
 ---
 
 ## Limites connues
 
-- **Le garde-fou vérifie la présence, pas le sens.** « Nous sommes labellisés Biogarantie » passe le contrôle des labels, parce que « Biogarantie » figure dans le contexte… dans la phrase qui dit que nous ne l'avons PAS. De même, « 6,5 % » attribué à la mauvaise bière passe. La relecture humaine reste indispensable. Une vérification au niveau des affirmations est listée dans les pistes.
+- **Le garde-fou vérifie la présence, pas le sens.** « Nous sommes labellisés Biogarantie » passe le contrôle des labels, parce que le mot figure dans le contexte… dans la phrase qui dit que nous ne l'avons PAS. Un chiffre attribué à la mauvaise bière passe aussi. La relecture humaine reste indispensable.
 - **Hallucinations non chiffrées** : un nom, une anecdote ou une citation inventés ne sont pas détectés automatiquement.
-- **Score de confiance** : c'est une auto-évaluation du modèle, corrigée par des règles. Ce n'est pas une probabilité calibrée.
-- **Mode démo** : ce n'est pas un LLM. Les textes sont corrects factuellement mais peu rédigés.
-- **RSS** : les extraits sont souvent courts. Les liens Google News sont des redirections, donc deux sources peuvent pointer vers le même article sans que la déduplication par URL le voie.
-- **Coût et quotas** : chaque article coûte 1 appel (résumé) et chaque post 1 appel (avec 1 retry en cas de JSON invalide). Le quota gratuit de Gemini limite le nombre d'appels par minute et par jour. `max_items_per_feed` borne le volume.
-- **RGPD et confidentialité** : sur les offres gratuites, les données envoyées peuvent être utilisées par le fournisseur pour améliorer ses modèles. Il ne faut pas y envoyer d'informations confidentielles (tarifs, données de partenaires). Les seules données personnelles traitées sont celles des partenaires mis en avant : il faut leur accord écrit (la persona l'ajoute en avertissement).
-- **Droit d'auteur et CGU** : on ne republie pas les articles, on en tire un angle et on garde le lien. Les conditions d'utilisation de chaque flux restent à vérifier pour un usage commercial.
-- **Mono-utilisateur** : stockage JSON sans verrou ni authentification, pas d'historique des versions d'un post.
+- **Score de confiance** : c'est une auto-évaluation du modèle corrigée par des règles, pas une probabilité calibrée.
+- **Mode démo** : ce n'est pas un LLM. Les textes sont exacts mais peu rédigés.
+- **Social listening limité au texte des flux** : pas d'accès aux posts des concurrents sur LinkedIn ou Instagram. Leurs API ne le permettent pas sans partenariat, et le scraping de ces plateformes est interdit par leurs CGU. Les liens Google News sont des redirections, donc la déduplication par URL peut laisser passer un même article venu de deux sources.
+- **Publishers réels non testés en conditions réelles** (voir plus haut).
+- **Coût et quotas** : 1 appel LLM par article résumé, 1 par post (plus 1 retry si le JSON est invalide), 1 appel d'image par visuel. `max_items_per_feed` borne le volume.
+- **RGPD et confidentialité** : sur les offres gratuites, les données envoyées peuvent servir à l'entraînement : il ne faut pas y envoyer d'informations confidentielles. Les seules données personnelles traitées sont celles des partenaires mis en avant, ce qui exige leur accord écrit (avertissement automatique).
+- **Mono-utilisateur** : stockage JSON sans verrou ni authentification.
 
-## Pistes d'amélioration
+## Pistes d'amélioration (approche growth)
 
-- **Vérification au niveau des affirmations** : découper le post en affirmations et vérifier chacune contre les passages (NLI, ou un second LLM « juge » avec citation obligatoire).
-- **Retrieval** : recherche hybride (BM25 + vecteurs), reranker, modèle d'embedding à fenêtre plus longue (ex. `multilingual-e5`).
-- **Évaluation** : jeu de référence annoté par l'équipe marketing, mesure du ton (respect de la charte) par un juge LLM, suivi des scores d'une version de prompt à l'autre.
-- **Interface de revue** (Streamlit ou petite app web) pour l'équipe marketing, avec historique des éditions.
-- **Vrais publishers** LinkedIn et Instagram, avec un job planifié et des tentatives de reprise.
-- **Images** : génération réelle (avec validation humaine), hébergement pour l'API Instagram.
-- **Coûts** : cache des résumés, prompt caching, suivi des tokens par commande.
-- **Boucle de retour** : réintégrer les posts approuvés et leurs statistiques d'engagement comme exemples dans les prompts.
+- **Boucle de performance** : récupérer l'engagement des posts publiés (LinkedIn Analytics, Instagram Insights), comparer les personas et les accroches, réinjecter les meilleurs posts comme exemples dans les prompts.
+- **A/B testing** : générer deux accroches par post et alterner.
+- **Vérification au niveau des affirmations** : un juge LLM ou un modèle NLI qui vérifie chaque phrase contre les passages.
+- **Retrieval** : recherche hybride (BM25 + vecteurs), reranker, modèle d'embedding à fenêtre plus longue.
+- **Interface de revue** (Streamlit ou petite app web) pour l'équipe, avec notifications (mail, Slack) quand les brouillons de la semaine sont prêts.
+- **Images** : hébergement automatique des visuels validés (stockage objet) pour fournir l'URL publique à Instagram.
 
 ## Structure du dépôt
 
 ```
 copilote-marketing/
   data/brand/            8 documents fictifs (histoire, charte, 3 fiches bières, labels, interview, FAQ)
-  data/feeds.yaml        flux RSS configurables
+  data/feeds.yaml        flux RSS + social listening (mots-clés, concurrents)
   data/demo_feed.xml     flux fictif pour la démo hors ligne
   prompts/               prompts versionnés et commentés
   src/                   code (voir le tableau des modules)
-  tests/                 tests unitaires + intégration + eval.py
+  tests/                 71 tests + eval.py
   out/examples/          exemples de sortie (2 LinkedIn, 1 Instagram, 1 programmation)
+  demo.ps1               démo guidée
   docs/                  spec de design
 ```
