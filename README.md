@@ -85,6 +85,8 @@ python -m src.cli export <id> <id>           # export markdown dans out/examples
 
 Options utiles : `generate --persona expertise_bio --persona instagram_craft`, `list --statut approuve`.
 
+Démo guidée de toute la chaîne, avec des pauses (Windows) : `powershell -ExecutionPolicy Bypass -File demo.ps1`
+
 ### Utiliser un vrai LLM
 
 Gemini (quota gratuit) : créer une clé sur [Google AI Studio](https://aistudio.google.com/apikey), puis dans `.env` :
