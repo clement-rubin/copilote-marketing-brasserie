@@ -18,6 +18,10 @@ CHROMA_DIR = ROOT / "chroma_db"
 # Charge le fichier .env s'il existe. Les variables déjà définies dans le shell restent prioritaires.
 load_dotenv(ROOT / ".env")
 
+# Windows sans mode développeur : Hugging Face ne peut pas créer de liens symboliques.
+# Le cache fonctionne quand même, on masque juste l'avertissement.
+os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
+
 
 def env(name: str, default: str = "") -> str:
     """Lit une variable d'environnement et enlève les espaces autour."""
