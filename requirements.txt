@@ -1,5 +1,6 @@
 # Dépendances du Copilote Marketing (Python 3.11+)
 anthropic>=0.40          # SDK officiel Claude
+google-genai>=1.0        # SDK officiel Gemini (quota gratuit via Google AI Studio)
 chromadb>=0.5            # base vectorielle locale
 sentence-transformers>=3.0  # embeddings multilingues en local
 feedparser>=6.0          # lecture des flux RSS
