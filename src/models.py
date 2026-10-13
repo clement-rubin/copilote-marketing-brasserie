@@ -43,7 +43,7 @@ class Status(str, Enum):
 # Transitions autorisées. Tout le reste est refusé par `Post.change_status`.
 ALLOWED_TRANSITIONS: dict[Status, set[Status]] = {
     Status.DRAFT: {Status.APPROVED, Status.REJECTED},
-    Status.APPROVED: {Status.SCHEDULED, Status.REJECTED},
+    Status.APPROVED: {Status.SCHEDULED, Status.REJECTED, Status.DRAFT},  # éditer = re-valider
     Status.REJECTED: {Status.DRAFT},  # on peut repasser un post rejeté en brouillon après édition
     Status.SCHEDULED: set(),
 }
@@ -116,9 +116,11 @@ class Post(BaseModel):
     texte: str
     hashtags: list[str] = Field(default_factory=list)
     sources_utilisees: list[str] = Field(default_factory=list)
-    score_confiance: float = Field(ge=0.0, le=1.0)
+    score_confiance: float = Field(ge=0.0, le=1.0)  # score final, après garde-fou
+    score_llm: float | None = None  # auto-évaluation brute du modèle, avant garde-fou
     avertissements: list[str] = Field(default_factory=list)
     article_url: str | None = None  # article de veille qui a servi de point de départ
+    contexte: str = ""  # passages RAG + article fournis au LLM : traçabilité et re-vérification
     prompt_image: str | None = None
     statut: Status = Status.DRAFT
     cree_le: datetime = Field(default_factory=datetime.now)
@@ -141,6 +143,7 @@ class Post(BaseModel):
             persona=persona,
             plateforme=persona.platform,
             article_url=article_url,
+            score_llm=draft.score_confiance,
             **draft.model_dump(),
         )
 

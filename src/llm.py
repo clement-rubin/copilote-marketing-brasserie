@@ -143,6 +143,10 @@ def get_llm_client(provider: str | None = None) -> LLMClient:
     provider = (provider or env("LLM_PROVIDER", "fake")).lower()
     if provider not in PROVIDERS:
         raise LLMError(f"LLM_PROVIDER inconnu : {provider!r}. Choix : {', '.join(PROVIDERS)}")
+    if provider == "fake":
+        from src.demo import demo_responder  # mode démo : réponses construites depuis le RAG
+
+        return FakeLLMClient(default=demo_responder)
     return PROVIDERS[provider]()
 
 
