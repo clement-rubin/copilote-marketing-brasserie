@@ -53,7 +53,8 @@ def _field(pattern: str, text: str) -> str:
 
 def _passages(user: str) -> list[tuple[str, str]]:
     """Extrait les couples (source, texte) des blocs [source: ...] du prompt."""
-    blocks = re.findall(r"\[source: ([^\]]+)\]\n(.*?)(?=\n\n\[source: |\n\n## |\Z)", user, re.DOTALL)
+    end = r"(?=\n\n\[source: |\n\n## |\n\nConsignes|\Z)"  # fin d'un bloc
+    blocks = re.findall(r"\[source: ([^\]]+)\]\n(.*?)" + end, user, re.DOTALL)
     return [(source, text) for source, text in blocks]
 
 
@@ -135,6 +136,53 @@ def generate_post(user: str) -> str:
     )
 
 
+def answer_question(user: str) -> str:
+    """Réponse démo : phrases qui contiennent les mots rares de la question, dans le bon passage.
+
+    - « sujet » = mots en majuscule de la question (Saison, Blonde…) : ils choisissent le passage ;
+    - les autres mots (degré, prix, fût…) doivent apparaître dans la phrase retenue ;
+    - chaque mot pèse 1 / (nombre de phrases qui le contiennent) : les mots rares départagent.
+    """
+    question = _field(r"^Question de l'équipe marketing : (.*)$", user)
+    generic = {"démo", "bière", "bières", "brasserie", "quel", "quelle", "quels", "avec", "quoi", "notre", "nos"}
+    raw_words = re.findall(r"\w+", question)
+    subject = {w.lower() for w in raw_words[1:] if w[0].isupper()} - generic
+    asked = {w.lower() for w in raw_words if len(w) > 3} - generic - subject
+
+    def words(text: str) -> set[str]:
+        return set(re.findall(r"\w+", text.lower()))
+
+    sentences = []  # (phrase, source, mots de la phrase, mots du passage)
+    for source, text in _passages(user):
+        body = text.split("\n", 1)[-1].replace("**", "")
+        for sentence in re.split(r"(?<=[.!?])\s+", body):
+            sentence = sentence.lstrip("- ").strip()
+            sentences.append((sentence, source, words(sentence), words(text)))
+    frequency = {w: sum(w in s[2] for s in sentences) or 1 for w in asked | subject}
+
+    scored = []
+    for sentence, source, in_sentence, in_passage in sentences:
+        hits = asked & in_sentence
+        if not hits:
+            continue  # la phrase doit répondre à la question, pas seulement citer le sujet
+        score = sum(1 / frequency[w] for w in hits) + sum(1 / frequency[w] for w in subject & in_passage)
+        scored.append((score, sentence, source))
+    best = sorted(scored, key=lambda s: -s[0])[:2]
+    if not best:
+        answer = {
+            "reponse": "Je ne trouve pas cette information dans la documentation.",
+            "sources_utilisees": [],
+            "avertissements": ["Aucun passage pertinent dans la documentation"],
+        }
+    else:
+        answer = {
+            "reponse": " ".join(sentence for _, sentence, _ in best),
+            "sources_utilisees": list(dict.fromkeys(source for *_, source in best)),
+            "avertissements": [DEMO_WARNING],
+        }
+    return json.dumps(answer, ensure_ascii=False)
+
+
 def demo_responder(system: str, user: str) -> str:
     """Point d'entrée branché sur FakeLLMClient : choisit la réponse selon la tâche du prompt."""
     task = _field(r"^# Tâche : (\w+)", user)
@@ -142,4 +190,6 @@ def demo_responder(system: str, user: str) -> str:
         return summarize_article(user)
     if task == "generation_post":
         return generate_post(user)
+    if task == "question":
+        return answer_question(user)
     raise ValueError(f"Tâche inconnue pour le mode démo : {task!r}")

@@ -49,6 +49,7 @@ def test_real_providers_require_key(monkeypatch):
         get_llm_client("gemini")
 
 
-def test_openai_is_a_stub():
-    with pytest.raises(LLMError, match="stub"):
+def test_openai_requires_key(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "")
+    with pytest.raises(LLMError, match="OPENAI_API_KEY"):
         get_llm_client("openai")

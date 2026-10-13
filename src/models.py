@@ -32,12 +32,13 @@ class Persona(str, Enum):
 
 
 class Status(str, Enum):
-    """Cycle de vie d'un post : brouillon -> approuve | rejete, puis approuve -> programme."""
+    """Cycle de vie : brouillon -> approuve | rejete, approuve -> programme -> publie."""
 
     DRAFT = "brouillon"
     APPROVED = "approuve"
     REJECTED = "rejete"
     SCHEDULED = "programme"
+    PUBLISHED = "publie"
 
 
 # Transitions autorisées. Tout le reste est refusé par `Post.change_status`.
@@ -45,7 +46,8 @@ ALLOWED_TRANSITIONS: dict[Status, set[Status]] = {
     Status.DRAFT: {Status.APPROVED, Status.REJECTED},
     Status.APPROVED: {Status.SCHEDULED, Status.REJECTED, Status.DRAFT},  # éditer = re-valider
     Status.REJECTED: {Status.DRAFT},  # on peut repasser un post rejeté en brouillon après édition
-    Status.SCHEDULED: set(),
+    Status.SCHEDULED: {Status.PUBLISHED},
+    Status.PUBLISHED: set(),
 }
 
 
@@ -87,6 +89,14 @@ class Article(BaseModel):
 # --------------------------------------------------------------------------- Posts
 
 
+class Answer(BaseModel):
+    """Réponse du LLM à une question posée à la base de connaissances (commande `ask`)."""
+
+    reponse: str = Field(min_length=1)
+    sources_utilisees: list[str] = Field(default_factory=list)
+    avertissements: list[str] = Field(default_factory=list)
+
+
 class PostDraft(BaseModel):
     """Sortie attendue du LLM pour un post. Validée avant toute sauvegarde."""
 
@@ -122,6 +132,9 @@ class Post(BaseModel):
     article_url: str | None = None  # article de veille qui a servi de point de départ
     contexte: str = ""  # passages RAG + article fournis au LLM : traçabilité et re-vérification
     prompt_image: str | None = None
+    image_path: str | None = None  # visuel généré localement (prototype)
+    image_url: str | None = None  # URL publique du visuel (exigée par l'API Instagram)
+    publications: dict[str, str] = Field(default_factory=dict)  # canal -> id renvoyé par l'API
     statut: Status = Status.DRAFT
     cree_le: datetime = Field(default_factory=datetime.now)
     programme_le: datetime | None = None

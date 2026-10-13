@@ -88,18 +88,26 @@ class GeminiClient(LLMClient):
 
 
 class OpenAIClient(LLMClient):
-    """Stub : montre où brancher OpenAI. Non implémenté dans ce MVP."""
+    """GPT via le SDK officiel `openai`. Modèle lu dans OPENAI_MODEL."""
 
     name = "openai"
 
     def __init__(self) -> None:
-        # Implémentation attendue : openai.OpenAI(api_key=OPENAI_API_KEY), puis
-        # client.chat.completions.create(model=OPENAI_MODEL, messages=[system, user],
-        # response_format={"type": "json_object"} si json_mode).
-        raise LLMError("OpenAIClient n'est pas implémenté (stub de démonstration).")
+        import openai  # import local, comme pour les autres fournisseurs
+
+        api_key, self.model = env("OPENAI_API_KEY"), env("OPENAI_MODEL")
+        if not api_key or not self.model:
+            raise LLMError("OPENAI_API_KEY et OPENAI_MODEL doivent être définis dans .env")
+        self.client = openai.OpenAI(api_key=api_key)
 
     def complete(self, system: str, user: str, json_mode: bool = False) -> str:
-        raise NotImplementedError
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
+            # Le mode JSON d'OpenAI garantit un JSON syntaxiquement valide.
+            response_format={"type": "json_object"} if json_mode else None,
+        )
+        return response.choices[0].message.content or ""
 
 
 class FakeLLMClient(LLMClient):

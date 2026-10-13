@@ -47,3 +47,13 @@ def posts_dir() -> Path:
 def scheduled_dir() -> Path:
     """Dossier où le MockPublisher écrit les posts programmés."""
     return OUT_DIR / "scheduled"
+
+
+def images_dir() -> Path:
+    """Dossier des visuels générés (prototypes)."""
+    return OUT_DIR / "images"
+
+
+def published_dir() -> Path:
+    """Dossier où le MockPublisher écrit les posts « publiés » en mode simulation."""
+    return OUT_DIR / "published"

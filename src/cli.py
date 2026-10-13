@@ -1,6 +1,7 @@
 """Interface en ligne de commande : python -m src.cli <commande>.
 
-Enchaînement type : ingest -> watch -> generate -> review -> schedule.
+Enchaînement type : ingest -> watch -> generate -> review -> schedule -> publish-due.
+Automatisé : `weekly` (une fois par semaine) et `publish-due` (toutes les 15 minutes).
 """
 
 import sys
@@ -18,9 +19,13 @@ from src.generate import generate_batch
 from src.ingest import ingest as run_ingest
 from src.llm import get_llm_client
 from src.models import Persona, Post, Status
-from src.publish import schedule as run_schedule
-from src.store import list_posts, load_post
-from src.watch import load_articles, load_feeds, watch as run_watch
+from src.orchestrate import weekly as run_weekly
+from src.publish import publish_due as run_publish_due, schedule as run_schedule
+from src.qa import ask as run_ask
+from src.store import list_posts, load_post, save_post
+from src.trends import analyze
+from src.visuals import create_visual
+from src.watch import load_articles, load_feeds, load_watchlist, watch as run_watch
 
 # Les émojis des posts doivent s'afficher même dans une console Windows.
 if hasattr(sys.stdout, "reconfigure"):
@@ -70,6 +75,89 @@ def generate(
     for post in posts:
         show_post(post)
     console.print(f"[green]{len(posts)} brouillon(s) créé(s).[/green] Validez-les avec `review`.")
+
+
+@app.command()
+def ask(question: str) -> None:
+    """Interroge la base de connaissances de la marque (réponse sourcée, sans invention)."""
+    answer = run_ask(get_llm_client(), question)
+    body = escape(answer.reponse) + f"\n\n[dim]Sources : {', '.join(answer.sources_utilisees) or 'aucune'}[/dim]"
+    for warning in answer.avertissements:
+        body += f"\n[yellow]⚠ {escape(warning)}[/yellow]"
+    console.print(Panel(body, title=escape(question), border_style="cyan"))
+
+
+@app.command()
+def trends(top: int = typer.Option(10, help="Nombre de termes affichés.")) -> None:
+    """Social listening : termes fréquents et mentions des mots-clés et concurrents suivis."""
+    articles = list(load_articles().values())
+    if not articles:
+        console.print("[red]Aucun article de veille. Lancez d'abord `watch`.[/red]")
+        raise typer.Exit(1)
+    report = analyze(articles, load_watchlist(), top=top)
+    terms = Table("terme", "articles", title=f"Tendances sur {report.n_articles} articles")
+    for term, count in report.top_terms:
+        terms.add_row(term, str(count))
+    console.print(terms)
+    if report.top_phrases:
+        console.print("Expressions récurrentes : " + ", ".join(f"{p} ({n})" for p, n in report.top_phrases))
+    mentions = Table("terme suivi", "type", "mentions", "exemple", title="Mots-clés et concurrents")
+    for mention in report.mentions:
+        example = mention.articles[0][:60] if mention.articles else ""
+        mentions.add_row(mention.term, mention.kind, str(len(mention.articles)), example)
+    console.print(mentions)
+
+
+@app.command()
+def visual(
+    post_id: str,
+    url: str = typer.Option(None, help="URL publique du visuel hébergé (exigée par l'API Instagram)."),
+) -> None:
+    """Génère le visuel d'un post (IMAGE_PROVIDER), ou enregistre l'URL publique du visuel."""
+    post = load_post(post_id)
+    if url:
+        post.image_url = url
+        console.print(f"[green]URL publique enregistrée pour {post_id}[/green]")
+    else:
+        path = create_visual(post)
+        console.print(f"[green]Visuel créé :[/green] {path}")
+    save_post(post)
+
+
+@app.command()
+def weekly(
+    offline: bool = typer.Option(False, help="Veille sur le flux fictif (sans réseau)."),
+    visuals: bool = typer.Option(True, help="Générer aussi les visuels (IMAGE_PROVIDER)."),
+) -> None:
+    """Flux hebdomadaire : veille + 3 brouillons (2 LinkedIn en rotation + 1 Instagram)."""
+    posts = run_weekly(get_llm_client(), offline=offline)
+    if not posts:
+        console.print("Aucun nouvel article à exploiter cette semaine.")
+        return
+    for post in posts:
+        if visuals:
+            create_visual(post)
+            save_post(post)
+        show_post(post)
+    console.print(f"[green]{len(posts)} brouillon(s) prêts pour la revue.[/green] Suite : `review`, puis `schedule`.")
+
+
+@app.command("publish-due")
+def publish_due(
+    live: bool = typer.Option(False, "--live", help="Publier via les vraies API (sinon PUBLISH_MODE, mock par défaut)."),
+    at: datetime = typer.Option(
+        None,
+        "--at",
+        formats=["%Y-%m-%d", "%Y-%m-%dT%H:%M"],
+        help="Simuler une autre date (ex. 2026-12-31 ou 2026-12-31T12:00) pour une démo.",
+    ),
+) -> None:
+    """Publie les posts programmés dont l'heure est passée (à lancer par cron / planificateur)."""
+    done = run_publish_due(now=at, mode="live" if live else None)
+    if not done:
+        console.print("Aucun post à publier pour l'instant.")
+    for post, channels in done:
+        console.print(f"[green]Publié[/green] {post.id} → " + ", ".join(f"{c}: {i}" for c, i in channels.items()))
 
 
 @app.command("list")
@@ -198,6 +286,8 @@ def show_post(post: Post, with_image: bool = False) -> None:
         body += f"\n[yellow]⚠ {escape(warning)}[/yellow]"
     if with_image and post.prompt_image:
         body += f"\n\n[magenta]Prompt image :[/magenta]\n{escape(post.prompt_image)}"
+    if post.image_path:
+        body += f"\n[magenta]Visuel :[/magenta] {escape(post.image_path)}"
     title = f"{post.id} · {post.plateforme.value} · {post.persona.value} · {post.statut.value}"
     console.print(Panel(body, title=title, border_style=color))
 

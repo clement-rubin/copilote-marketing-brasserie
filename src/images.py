@@ -1,8 +1,9 @@
-"""Génération de PROMPTS d'images (Midjourney / DALL-E). Aucune image n'est générée ici.
+"""Prompts d'images (Midjourney / DALL-E) construits par gabarit, à partir du post.
 
 Choix : un gabarit déterministe plutôt qu'un appel LLM. La direction artistique d'une marque
 doit être stable d'un post à l'autre ; un gabarit garantit la même palette et les mêmes
 interdits à chaque fois, sans coût ni variabilité.
+La génération de l'image elle-même est dans src/visuals.py.
 """
 
 from src.models import Persona, Platform, Post

@@ -11,7 +11,7 @@ from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 from time import mktime
-from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from urllib.parse import parse_qsl, quote_plus, urlencode, urlsplit, urlunsplit
 
 import feedparser
 import yaml
@@ -31,10 +31,37 @@ def fetch_feed(url: str) -> feedparser.FeedParserDict:
     return feedparser.parse(url, agent=USER_AGENT)
 
 
+GOOGLE_NEWS_RSS = "https://news.google.com/rss/search?q={query}&hl=fr&gl=BE&ceid=BE:fr"
+
+
+def _read_config(path: Path | None = None) -> dict:
+    return yaml.safe_load((path or config.FEEDS_FILE).read_text(encoding="utf-8"))
+
+
+def load_watchlist(path: Path | None = None) -> dict[str, list[str]]:
+    """Termes du social listening : {"keywords": [...], "competitors": [...]}."""
+    listening = _read_config(path).get("listening") or {}
+    return {
+        "keywords": list(listening.get("keywords") or []),
+        "competitors": list(listening.get("competitors") or []),
+    }
+
+
+def listening_feeds(watchlist: dict[str, list[str]]) -> list[dict]:
+    """Transforme chaque terme suivi en recherche Google News RSS (flux public, pas de scraping)."""
+    feeds = []
+    for kind, theme in (("keywords", "listening"), ("competitors", "concurrent")):
+        for term in watchlist.get(kind, []):
+            query = quote_plus(f'"{term}"' if kind == "competitors" else term)
+            feeds.append({"name": f"Google News - {term}", "url": GOOGLE_NEWS_RSS.format(query=query), "theme": theme})
+    return feeds
+
+
 def load_feeds(path: Path | None = None) -> tuple[list[dict], int]:
-    """Lit feeds.yaml : renvoie la liste des flux et le nombre max d'articles par flux."""
-    data = yaml.safe_load((path or config.FEEDS_FILE).read_text(encoding="utf-8"))
-    return data["feeds"], int(data.get("max_items_per_feed", 5))
+    """Lit feeds.yaml : flux fixes + recherches du social listening, et le max d'articles par flux."""
+    data = _read_config(path)
+    feeds = list(data["feeds"]) + listening_feeds(load_watchlist(path))
+    return feeds, int(data.get("max_items_per_feed", 5))
 
 
 def normalize_url(url: str) -> str:

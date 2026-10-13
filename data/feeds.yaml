@@ -28,5 +28,18 @@ feeds:
     theme: chr
     lang: fr
 
+# Social listening : chaque terme devient une recherche Google News RSS (FR, Belgique),
+# et ses mentions sont comptées par `python -m src.cli trends`.
+listening:
+  # Tendances du marché et de la filière CHR / bio
+  keywords:
+    - bière bio CHR
+    - brasserie artisanale tendance
+    - bière sans alcool artisanale
+  # Mots-clés des concurrents (noms de brasseries, de gammes, de bières).
+  # Valeur FICTIVE pour la démo : à remplacer par la liste établie avec la direction.
+  competitors:
+    - Brasserie Exemple
+
 # Nombre maximum d'articles lus par flux à chaque passage (limite le coût LLM).
 max_items_per_feed: 5

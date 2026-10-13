@@ -35,6 +35,13 @@
       <description>Article fictif. À l'approche de l'hiver, les petites brasseries lancent des bières plus maltées et plus rondes, souvent pensées pour accompagner les plats mijotés.</description>
     </item>
 
+    <item>
+      <title>La Brasserie Exemple lance une bière bio au sureau pour les terrasses</title>
+      <link>https://example.org/actu/brasserie-exemple-sureau</link>
+      <pubDate>Thu, 08 Oct 2026 11:00:00 +0200</pubDate>
+      <description>Article fictif. La Brasserie Exemple (fictive), concurrente régionale, mise sur une bière bio légère aromatisée au sureau, vendue en priorité aux cafés avec terrasse. Elle annonce une campagne sur Instagram autour des bières de terrasse.</description>
+    </item>
+
     <!-- Doublon volontaire (même URL sans paramètre de suivi) : doit être ignoré par la déduplication. -->
     <item>
       <title>Les cavistes indépendants misent sur les bières bio locales</title>

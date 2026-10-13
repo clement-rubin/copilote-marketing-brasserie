@@ -89,3 +89,38 @@ def schedule(publisher: Publisher | None = None, today: date | None = None) -> l
         publisher.publish(post, when)
         save_post(post)
     return planning
+
+
+def channels_for(post: Post, mode: str) -> dict[str, Publisher]:
+    """Canaux de publication d'un post : simulation (mock) ou API réelles (live)."""
+    if mode == "live":
+        from src.social import live_publishers  # import local : évite un import circulaire
+
+        return live_publishers(post.plateforme)
+    return {"mock": MockPublisher(config.published_dir())}
+
+
+def publish_due(now: datetime | None = None, mode: str | None = None) -> list[tuple[Post, dict[str, str]]]:
+    """Publie les posts programmés dont l'heure est passée. À lancer régulièrement (cron).
+
+    Mode lu dans PUBLISH_MODE (mock par défaut). Un échec laisse le post programmé : il sera
+    retenté au passage suivant, sans republier les canaux déjà réussis.
+    """
+    now = now or datetime.now()
+    mode = mode or config.env("PUBLISH_MODE", "mock")
+    done = []
+    for post in list_posts(Status.SCHEDULED):
+        if not post.programme_le or post.programme_le > now:
+            continue
+        try:
+            for channel, publisher in channels_for(post, mode).items():
+                if channel not in post.publications:
+                    post.publications[channel] = publisher.publish(post, now)
+                    save_post(post)  # on mémorise chaque canal réussi immédiatement
+        except Exception as error:  # une erreur d'API ne doit pas bloquer les autres posts
+            print(f"[publication] {post.id} : échec, nouvel essai au prochain passage ({error})")
+            continue
+        post.change_status(Status.PUBLISHED)
+        save_post(post)
+        done.append((post, dict(post.publications)))
+    return done
