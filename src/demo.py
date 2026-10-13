@@ -22,7 +22,7 @@ HOOKS = {
     "expertise_bio": "Le logo bio, tout le monde le connaît. Ce qu'il garantit, beaucoup moins.",
     "coulisses_brassage": "Brasser, ce n'est pas que verser du malt dans une cuve.",
     "mise_en_avant_distributeur": "Une bière ne se vend pas toute seule. Merci à ceux qui la racontent.",
-    "instagram_craft": "Petite pause dégustation 🍻",
+    "instagram_craft": "Petite pause dégustation à la grange 🍻 Aujourd'hui, on te parle d'une de nos bières.",
 }
 
 CALLS_TO_ACTION = {
@@ -40,7 +40,7 @@ KEYWORDS = {
     "instagram_craft": ["bouche :", "nez :"],
 }
 
-INSTAGRAM_TARGET = 90  # longueur des faits pour une légende de 150 à 500 caractères
+INSTAGRAM_TARGET = 60  # longueur des faits pour une légende de 150 à 500 caractères
 LINKEDIN_TARGET = 700  # on ajoute des faits jusqu'à environ cette longueur (charte : 600 à 1 300)
 
 INSTAGRAM_TAGS = ["#BrasserieDemoDuHainaut", "#BiereBio", "#BiereArtisanale", "#CraftBeer", "#Hainaut"]
@@ -99,16 +99,18 @@ def generate_post(user: str) -> str:
     is_instagram = persona == "instagram_craft"
     facts: list[str] = []
     sources: list[str] = []
-    for *_, sentence, source in candidates:
-        if sentence in facts:
-            continue
-        if is_instagram and len(" ".join(facts)) > INSTAGRAM_TARGET:
-            break
-        if not is_instagram and len(" ".join(facts)) > LINKEDIN_TARGET - 300:
-            break
-        facts.append(sentence)
-        if source not in sources:
-            sources.append(source)
+    target = INSTAGRAM_TARGET if is_instagram else LINKEDIN_TARGET - 300
+    # Instagram : 1er passage limité à une seule fiche (une légende parle d'une seule bière),
+    # 2e passage sans contrainte si la légende reste trop courte.
+    for single_source in ([True, False] if is_instagram else [False]):
+        for *_, sentence, source in candidates:
+            if len(" ".join(facts)) > target:
+                break
+            if sentence in facts or (single_source and sources and source != sources[0]):
+                continue
+            facts.append(sentence)
+            if source not in sources:
+                sources.append(source)
 
     if is_instagram:
         text = " ".join([HOOKS[persona], *facts, CALLS_TO_ACTION[persona]])

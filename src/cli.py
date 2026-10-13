@@ -4,6 +4,8 @@ Enchaînement type : ingest -> watch -> generate -> review -> schedule.
 """
 
 import sys
+from datetime import datetime
+from pathlib import Path
 
 import typer
 from rich.console import Console
@@ -82,7 +84,7 @@ def list_command(statut: Status = typer.Option(None, help="Filtrer par statut.")
             post.statut.value,
             f"{post.score_confiance:.2f}",
             str(len(post.avertissements)),
-            f"{post.programme_le:%a %d/%m %Hh%M}" if post.programme_le else "",
+            french_date(post.programme_le) if post.programme_le else "",
         )
     console.print(table)
 
@@ -143,9 +145,46 @@ def schedule() -> None:
         return
     table = Table("date", "plateforme", "id", "début du texte")
     for post, when in planning:
-        table.add_row(f"{when:%a %d/%m/%Y %Hh%M}", post.plateforme.value, post.id, post.texte[:60] + "…")
+        table.add_row(french_date(when), post.plateforme.value, post.id, post.texte[:60] + "…")
     console.print(table)
     console.print(f"[green]{len(planning)} post(s) programmé(s)[/green] dans {config.scheduled_dir()}")
+
+
+@app.command()
+def export(
+    post_ids: list[str],
+    dest: Path = typer.Option(config.OUT_DIR / "examples", help="Dossier de destination."),
+) -> None:
+    """Exporte des posts en markdown lisible (texte, sources, avertissements, prompt d'image)."""
+    dest.mkdir(parents=True, exist_ok=True)
+    for post_id in post_ids:
+        post = load_post(post_id)
+        path = dest / f"{post.plateforme.value}_{post.persona.value}_{post.id}.md"
+        path.write_text(post_to_markdown(post), encoding="utf-8")
+        console.print(f"[green]Exporté :[/green] {path}")
+
+
+JOURS = ["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."]
+
+
+def french_date(when: datetime) -> str:
+    """'mar. 20/10/2026 09h00', indépendamment de la langue du système."""
+    return f"{JOURS[when.weekday()]} {when:%d/%m/%Y %Hh%M}"
+
+
+def post_to_markdown(post: Post) -> str:
+    """Rendu markdown d'un post, avec toutes ses métadonnées de traçabilité."""
+    warnings = "\n".join(f"- {w}" for w in post.avertissements) or "- aucun"
+    sources = ", ".join(f"`{s}`" for s in post.sources_utilisees) or "aucune"
+    return (
+        f"# {post.plateforme.value.capitalize()} · {post.persona.value}\n\n"
+        f"- Identifiant : `{post.id}`\n- Statut : {post.statut.value}\n"
+        f"- Article de départ : {post.article_url}\n- Sources de marque : {sources}\n"
+        f"- Score de confiance : {post.score_confiance:.2f}\n\n"
+        f"## Texte\n\n{post.texte}\n\n{' '.join(post.hashtags)}\n\n"
+        f"## Avertissements\n\n{warnings}\n\n"
+        f"## Prompt d'image\n\n```text\n{post.prompt_image}\n```\n"
+    )
 
 
 def show_post(post: Post, with_image: bool = False) -> None:
