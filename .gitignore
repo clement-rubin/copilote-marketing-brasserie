@@ -1,0 +1,13 @@
+# Secrets
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Données générées (la base vectorielle se reconstruit avec `ingest`)
+chroma_db/
+out/*
+!out/examples/

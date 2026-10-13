@@ -1,0 +1,32 @@
+# Flux RSS surveillés par `python -m src.cli watch`.
+# Règle : uniquement des flux RSS publics ou des API officielles. Pas de scraping de pages HTML.
+# Chaque flux a un thème, utilisé pour filtrer et pour expliquer la pertinence au LLM.
+
+feeds:
+  - name: CraftBeer.com (Brewers Association)
+    url: https://www.craftbeer.com/feed
+    theme: craft_beer
+    lang: en
+
+  - name: Brewers Association
+    url: https://www.brewersassociation.org/feed/
+    theme: brasserie_artisanale
+    lang: en
+
+  - name: Google News - bière artisanale (BE)
+    url: https://news.google.com/rss/search?q=bi%C3%A8re+artisanale&hl=fr&gl=BE&ceid=BE:fr
+    theme: brasserie_artisanale
+    lang: fr
+
+  - name: Google News - brasserie bio (FR)
+    url: https://news.google.com/rss/search?q=brasserie+bio&hl=fr&gl=FR&ceid=FR:fr
+    theme: bio
+    lang: fr
+
+  - name: Google News - horeca bière (BE)
+    url: https://news.google.com/rss/search?q=horeca+bi%C3%A8re&hl=fr&gl=BE&ceid=BE:fr
+    theme: chr
+    lang: fr
+
+# Nombre maximum d'articles lus par flux à chaque passage (limite le coût LLM).
+max_items_per_feed: 5
