@@ -40,6 +40,7 @@ KEYWORDS = {
     "instagram_craft": ["bouche :", "nez :"],
 }
 
+INSTAGRAM_TARGET = 90  # longueur des faits pour une légende de 150 à 500 caractères
 LINKEDIN_TARGET = 700  # on ajoute des faits jusqu'à environ cette longueur (charte : 600 à 1 300)
 
 INSTAGRAM_TAGS = ["#BrasserieDemoDuHainaut", "#BiereBio", "#BiereArtisanale", "#CraftBeer", "#Hainaut"]
@@ -101,7 +102,7 @@ def generate_post(user: str) -> str:
     for *_, sentence, source in candidates:
         if sentence in facts:
             continue
-        if is_instagram and facts:
+        if is_instagram and len(" ".join(facts)) > INSTAGRAM_TARGET:
             break
         if not is_instagram and len(" ".join(facts)) > LINKEDIN_TARGET - 300:
             break
