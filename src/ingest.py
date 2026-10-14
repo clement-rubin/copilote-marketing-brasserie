@@ -13,6 +13,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import chromadb
 import yaml
@@ -25,6 +26,9 @@ MAX_TOKENS = 120
 OVERLAP_TOKENS = 30
 
 TokenCounter = Callable[[str], int]
+
+if TYPE_CHECKING:  # import réservé aux annotations : le modèle n'est chargé qu'à l'usage
+    from sentence_transformers import SentenceTransformer
 
 
 @dataclass
@@ -42,7 +46,7 @@ class Chunk:
 
 
 @lru_cache(maxsize=1)
-def get_embedder():
+def get_embedder() -> "SentenceTransformer":
     """Charge le modèle une seule fois (le premier appel le télécharge, environ 470 Mo)."""
     from sentence_transformers import SentenceTransformer
 
@@ -165,7 +169,7 @@ def chunk_document(path: Path, count: TokenCounter = count_tokens) -> list[Chunk
 # --------------------------------------------------------------------------- Stockage
 
 
-def get_collection(chroma_dir: Path | None = None, reset: bool = False):
+def get_collection(chroma_dir: Path | None = None, reset: bool = False) -> chromadb.Collection:
     """Ouvre (ou recrée) la collection ChromaDB. Les embeddings sont calculés par nous."""
     client = chromadb.PersistentClient(path=str(chroma_dir or config.CHROMA_DIR))
     if reset and COLLECTION in [c.name for c in client.list_collections()]:

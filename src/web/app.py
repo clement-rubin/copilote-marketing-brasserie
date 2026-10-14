@@ -6,10 +6,11 @@ Usage local et mono-utilisateur (pas d'authentification).
 """
 
 import threading
+from collections.abc import Callable
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -34,7 +35,7 @@ app = FastAPI(title="Copilote Marketing", version="0.2.0")
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 @app.middleware("http")
-async def no_cache_for_pages(request, call_next):
+async def no_cache_for_pages(request: Request, call_next: Callable) -> Response:
     """Toujours revalider la page et ses fichiers : une mise à jour du code est vue immédiatement."""
     response = await call_next(request)
     if request.url.path == "/" or request.url.path.startswith("/static/"):
@@ -92,7 +93,7 @@ def _get(post_id: str) -> Post:
         raise HTTPException(404, f"Post introuvable : {post_id}")
 
 
-def _guard(action):
+def _guard(action: Callable[[], Post]) -> Post:
     """Transforme les erreurs métier (transition interdite, etc.) en erreur HTTP 400 lisible."""
     try:
         return action()
@@ -105,11 +106,13 @@ def _guard(action):
 
 @app.get("/", include_in_schema=False)
 def index() -> FileResponse:
+    """Page unique de l'interface."""
     return FileResponse(STATIC / "index.html")
 
 
 @app.get("/images/{name}", include_in_schema=False)
 def image(name: str) -> FileResponse:
+    """Sert un visuel généré, sans permettre de sortir du dossier des images."""
     path = (config.images_dir() / name).resolve()
     if path.parent != config.images_dir().resolve() or not path.exists():
         raise HTTPException(404)
@@ -121,6 +124,7 @@ def image(name: str) -> FileResponse:
 
 @app.get("/api/dashboard")
 def dashboard() -> dict:
+    """Indicateurs du tableau de bord : statuts, veille, tendances, prochaines publications."""
     posts = list_posts()
     articles = list(load_articles().values())
     upcoming = sorted(
@@ -150,12 +154,14 @@ def dashboard() -> dict:
 
 @app.post("/api/ingest")
 def run_ingest() -> dict:
+    """Réindexe les documents de marque dans ChromaDB."""
     chunks = ingest()
     return {"chunks": len(chunks), "documents": len({c.source for c in chunks})}
 
 
 @app.post("/api/ask")
 def run_ask(body: AskRequest) -> dict:
+    """Question à la base de connaissances : réponse sourcée ou « je ne trouve pas »."""
     if not body.question.strip():
         raise HTTPException(400, "Question vide")
     return ask(get_llm_client(), body.question).model_dump()
@@ -166,12 +172,14 @@ def run_ask(body: AskRequest) -> dict:
 
 @app.get("/api/articles")
 def articles() -> list[dict]:
+    """Articles de veille, avec un indicateur « déjà utilisé pour un post »."""
     used = {p.article_url for p in list_posts()}
     return [a.model_dump(mode="json") | {"utilise": a.url in used} for a in load_articles().values()]
 
 
 @app.post("/api/watch")
 def run_watch(body: WatchRequest) -> dict:
+    """Lance la veille (flux fictif ou flux réels + social listening)."""
     llm = get_llm_client()
     if body.offline:
         added = watch(llm, feeds=[DEMO_FEED], max_items=10)
@@ -183,6 +191,7 @@ def run_watch(body: WatchRequest) -> dict:
 
 @app.get("/api/trends")
 def trends() -> dict:
+    """Tendances et mentions des mots-clés et concurrents suivis."""
     report = analyze(list(load_articles().values()), load_watchlist(), top=12)
     return {
         "n_articles": report.n_articles,
@@ -197,6 +206,7 @@ def trends() -> dict:
 
 @app.post("/api/generate")
 def run_generate(body: GenerateRequest) -> list[dict]:
+    """Rédige un brouillon (avec visuel) par persona demandée, à partir d'un article."""
     article = load_articles().get(body.article_url)
     if not article:
         raise HTTPException(404, "Article de veille introuvable")
@@ -212,6 +222,7 @@ def run_generate(body: GenerateRequest) -> list[dict]:
 
 @app.post("/api/weekly")
 def run_weekly(body: WatchRequest) -> list[dict]:
+    """Flux hebdomadaire : veille + 3 brouillons (2 LinkedIn + 1 Instagram) avec visuels."""
     posts = weekly(get_llm_client(), offline=body.offline)
     for post in posts:
         create_visual(post)
@@ -224,34 +235,40 @@ def run_weekly(body: WatchRequest) -> list[dict]:
 
 @app.get("/api/posts")
 def posts(statut: Status | None = None) -> list[dict]:
+    """Liste des posts, du plus récent au plus ancien, filtrable par statut."""
     return [_post_json(p) for p in reversed(list_posts(statut))]
 
 
 @app.get("/api/posts/{post_id}")
 def post(post_id: str) -> dict:
+    """Détail d'un post."""
     return _post_json(_get(post_id))
 
 
 @app.post("/api/posts/{post_id}/approve")
 def approve(post_id: str, body: ReviewRequest) -> dict:
+    """Approuve un brouillon."""
     _get(post_id)
     return _post_json(_guard(lambda: review.approve(post_id, body.note)))
 
 
 @app.post("/api/posts/{post_id}/reject")
 def reject(post_id: str, body: ReviewRequest) -> dict:
+    """Rejette un post, avec une note facultative."""
     _get(post_id)
     return _post_json(_guard(lambda: review.reject(post_id, body.note)))
 
 
 @app.post("/api/posts/{post_id}/edit")
 def edit(post_id: str, body: EditRequest) -> dict:
+    """Remplace le texte, relance le garde-fou et repasse le post en brouillon."""
     _get(post_id)
     return _post_json(_guard(lambda: review.edit(post_id, body.texte)))
 
 
 @app.post("/api/posts/{post_id}/visual")
 def visual(post_id: str) -> dict:
+    """(Re)génère le visuel d'un post."""
     post = _get(post_id)
     create_visual(post)
     save_post(post)
@@ -280,12 +297,14 @@ def calendar(weeks: int = 4) -> list[dict]:
 
 @app.post("/api/schedule")
 def run_schedule() -> dict:
+    """Programme les posts approuvés dans les prochains créneaux libres."""
     planning = schedule()
     return {"programmes": [{"id": p.id, "date": when.isoformat()} for p, when in planning]}
 
 
 @app.post("/api/publish-due")
 def run_publish_due(body: PublishRequest) -> dict:
+    """Publie les posts arrivés à échéance (date simulable)."""
     done = publish_due(now=body.at)
     return {"publies": [{"id": p.id, "canaux": channels} for p, channels in done]}
 
@@ -295,6 +314,7 @@ def run_publish_due(body: PublishRequest) -> dict:
 
 @app.post("/api/eval")
 def run_eval() -> dict:
+    """Lance la mini-évaluation sur 10 cas et le contrôle des détecteurs."""
     from tests.eval import detector_controls, run_eval as evaluate
 
     results = evaluate()

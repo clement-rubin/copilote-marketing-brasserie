@@ -1,7 +1,9 @@
 """Social listening : tendances et mentions des concurrents dans les articles de veille.
 
+Calculé sur le texte SOURCE (titre + extrait RSS), jamais sur le résumé produit par le LLM :
+une tendance doit refléter ce que dit le marché, pas ce que le modèle a reformulé.
 Volontairement simple et sans LLM (donc gratuit et reproductible) :
-- termes et expressions les plus fréquents dans les titres et résumés ;
+- termes et expressions les plus fréquents dans les titres et extraits ;
 - nombre d'articles qui mentionnent chaque mot-clé suivi et chaque concurrent.
 """
 
@@ -51,12 +53,17 @@ def _words(text: str) -> list[str]:
     return [w for w in words if len(w) >= 3 and w not in STOPWORDS]  # 3 lettres : « bio », « chr »
 
 
+def source_text(article: Article) -> str:
+    """Titre + extrait RSS ; le résumé ne sert que pour les articles collectés avant l'ajout de l'extrait."""
+    return f"{article.titre} {article.extrait or article.resume}"
+
+
 def analyze(articles: list[Article], watchlist: dict[str, list[str]], top: int = 10) -> TrendReport:
     """Calcule les termes fréquents et les mentions des termes suivis."""
     terms: Counter[str] = Counter()
     phrases: Counter[str] = Counter()
     for article in articles:
-        words = _words(f"{article.titre} {article.resume}")
+        words = _words(source_text(article))
         terms.update(set(words))  # on compte les articles, pas les répétitions
         phrases.update({f"{a} {b}" for a, b in zip(words, words[1:])})
 
@@ -69,7 +76,7 @@ def analyze(articles: list[Article], watchlist: dict[str, list[str]], top: int =
     mentions = []
     for kind, label in (("keywords", "mot-clé"), ("competitors", "concurrent")):
         for term in watchlist.get(kind, []):
-            hits = [a.titre for a in articles if matches(term, kind, _fold(f"{a.titre} {a.resume}"))]
+            hits = [a.titre for a in articles if matches(term, kind, _fold(source_text(a)))]
             mentions.append(Mention(term, label, hits))
 
     return TrendReport(

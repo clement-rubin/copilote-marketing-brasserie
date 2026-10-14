@@ -1,16 +1,28 @@
-# Dépendances du Copilote Marketing (Python 3.11+)
-anthropic>=0.40          # SDK officiel Claude
-google-genai>=1.0        # SDK officiel Gemini (quota gratuit via Google AI Studio)
-openai>=1.40             # SDK officiel OpenAI (texte + DALL-E / gpt-image)
-httpx>=0.27              # appels HTTP aux API LinkedIn et Meta
-chromadb>=0.5            # base vectorielle locale
-sentence-transformers>=3.0  # embeddings multilingues en local
-feedparser>=6.0          # lecture des flux RSS
-pydantic>=2.6            # validation des sorties du LLM
-typer>=0.12              # CLI
-rich>=13.7               # tableaux dans le terminal
-python-dotenv>=1.0       # lecture du fichier .env
-pyyaml>=6.0              # lecture de feeds.yaml
-fastapi>=0.110           # API de l'interface web
-uvicorn>=0.29           # serveur de l'interface web
-pytest>=8.0
+# Dépendances du Copilote Marketing (Python 3.11 ou 3.12)
+# Bornes : version minimale + version majeure suivante exclue, pour qu'un clone futur
+# ne casse pas sur une rupture d'API. Versions exactes validées le 2026-10-14 en commentaire.
+
+# LLM (SDK officiels)
+anthropic>=1.0,<2            # 1.13.0
+google-genai>=1.0,<3         # 2.30.1 (quota gratuit via Google AI Studio)
+openai>=1.40,<4              # 3.29.0 (texte + DALL-E / gpt-image)
+
+# RAG
+chromadb>=1.0,<2             # 1.5.9  base vectorielle locale
+sentence-transformers>=3.0,<7  # 6.1.0  embeddings multilingues en local
+
+# Veille, validation, CLI
+feedparser>=6.0,<7           # 6.0.14
+httpx>=0.27,<1               # 0.28.1 appels HTTP aux API LinkedIn et Meta
+pydantic>=2.6,<3             # 2.14.1
+typer>=0.12,<1               # 0.27.3
+rich>=13.7,<16               # 15.0.0
+python-dotenv>=1.0,<2        # 1.2.4
+pyyaml>=6.0,<7               # 6.0.3
+
+# Interface web
+fastapi>=0.110,<1            # 0.143.0
+uvicorn>=0.29,<1             # 0.54.0
+
+# Tests
+pytest>=8.0,<10              # 9.1.1

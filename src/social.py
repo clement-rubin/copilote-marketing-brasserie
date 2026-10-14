@@ -8,6 +8,7 @@ la mise en production (les deux plateformes versionnent leurs API).
 """
 
 import re
+from datetime import datetime
 
 import httpx
 
@@ -62,7 +63,7 @@ class LinkedInPublisher(Publisher):
         )
         self.client = client or httpx.Client(timeout=30)
 
-    def publish(self, post: Post, when) -> str:
+    def publish(self, post: Post, when: datetime) -> str:
         body = {
             "author": f"urn:li:organization:{self.organization}",
             "commentary": linkedin_commentary(post.texte, post.hashtags),
@@ -104,7 +105,7 @@ class InstagramPublisher(_MetaPublisher):
         super().__init__(client)
         (self.user_id,) = _require("INSTAGRAM_USER_ID")
 
-    def publish(self, post: Post, when) -> str:
+    def publish(self, post: Post, when: datetime) -> str:
         if not post.image_url:
             raise PublishError(f"Post {post.id} : Instagram exige une image à une URL publique (image_url).")
         caption = f"{post.texte}\n\n{' '.join(post.hashtags)}"
@@ -120,7 +121,7 @@ class FacebookPublisher(_MetaPublisher):
         super().__init__(client)
         (self.page_id,) = _require("FACEBOOK_PAGE_ID")
 
-    def publish(self, post: Post, when) -> str:
+    def publish(self, post: Post, when: datetime) -> str:
         message = f"{post.texte}\n\n{' '.join(post.hashtags)}"
         if post.image_url:
             return self._post(f"{self.page_id}/photos", url=post.image_url, caption=message)["id"]

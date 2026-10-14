@@ -32,3 +32,11 @@ def test_competitor_and_keyword_mentions_ignore_case_and_accents():
     assert len(by_term["BIERE BIO"].articles) == 2
     assert by_term["brasserie exemple"].kind == "concurrent"
     assert by_term["brasserie exemple"].articles == ["Brasserie Exemple : nouvelle bière au sureau"]
+
+
+def test_trends_use_rss_source_not_llm_summary():
+    item = Article(url="https://example.org/x", titre="Houblon", flux="t", theme="t",
+                   extrait="Le houblon local progresse.", resume="Résumé reformulé par le modèle.")
+    terms = dict(analyze([item], {}).top_terms)
+    assert "local" in terms
+    assert "reformulé" not in terms

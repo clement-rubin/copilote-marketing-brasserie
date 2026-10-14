@@ -82,6 +82,7 @@ class Article(BaseModel):
     theme: str
     publie_le: datetime | None = None
     collecte_le: datetime = Field(default_factory=datetime.now)
+    extrait: str = ""  # texte source du flux RSS (base des tendances, jamais réécrit par le LLM)
     resume: str = ""
     pertinence: str = ""
 

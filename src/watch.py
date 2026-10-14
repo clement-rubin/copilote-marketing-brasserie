@@ -141,8 +141,9 @@ def watch(
                 theme=feed.get("theme", ""),
                 publie_le=datetime.fromtimestamp(mktime(published)) if published else None,
             )
+            article.extrait = clean_html(entry.get("summary", ""))
             try:
-                summary = summarize(llm, article, clean_html(entry.get("summary", "")))
+                summary = summarize(llm, article, article.extrait)
             except LLMError as error:
                 print(f"[veille] résumé impossible, article réessayé au prochain passage : {error}")
                 continue
