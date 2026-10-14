@@ -1,0 +1,26 @@
+# Déploiement Netlify : site statique en lecture seule, déjà construit dans site/.
+# Régénérer le site : python -m src.cli export-site   (puis commit + push : Netlify redéploie).
+# Pas de commande de build : Netlify ne peut pas faire tourner le serveur Python (voir README).
+
+[build]
+  publish = "site"
+  command = "echo 'Site pré-généré par python -m src.cli export-site'"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Les données de démo changent à chaque export : toujours revalider.
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "no-cache"

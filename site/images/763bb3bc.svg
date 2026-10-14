@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="627" viewBox="0 0 1200 627">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#6F4E37"/><stop offset="1" stop-color="#B5651D"/></linearGradient></defs>
+  <rect width="100%" height="100%" fill="url(#g)"/>
+  <text x="60" y="90" font-family="Georgia, serif" font-size="30" fill="#F4EFE6" opacity="0.8">PROTOTYPE · linkedin · 1200×627</text>
+  <text x="60" y="190" font-family="Georgia, serif" font-size="36" fill="#F4EFE6"><tspan x="60" dy="0">gros plan sur des grains d&#x27;orge et des cônes de</tspan><tspan x="60" dy="46">houblon dans des mains de brasseur, champ d&#x27;orge</tspan><tspan x="60" dy="46">flou en arrière-plan.</tspan></text>
+  <rect x="60" y="497" width="70" height="70" rx="8" fill="#B5651D" stroke="#fff"/><rect x="150" y="497" width="70" height="70" rx="8" fill="#8A9A5B" stroke="#fff"/><rect x="240" y="497" width="70" height="70" rx="8" fill="#6F4E37" stroke="#fff"/><rect x="330" y="497" width="70" height="70" rx="8" fill="#F4EFE6" stroke="#fff"/>
+  <text x="440" y="542" font-family="Georgia, serif" font-size="24" fill="#F4EFE6">post 763bb3bc</text>
+</svg>

@@ -11,7 +11,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -19,7 +19,7 @@ from src import config, review
 from src.config import env
 from src.generate import generate_post
 from src.ingest import get_collection, get_embedder, ingest
-from src.llm import get_llm_client
+from src.llm import LLMError, get_llm_client
 from src.models import Persona, Post, Status
 from src.orchestrate import DEMO_FEED, weekly
 from src.publish import WEEKLY_SLOTS, publish_due, schedule
@@ -33,6 +33,12 @@ STATIC = Path(__file__).parent / "static"
 
 app = FastAPI(title="Copilote Marketing", version="0.2.0")
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
+
+@app.exception_handler(LLMError)
+async def llm_unavailable(request: Request, error: LLMError) -> JSONResponse:
+    """LLM saturé, quota dépassé ou clé refusée : réponse 503 lisible plutôt qu'une erreur 500."""
+    return JSONResponse(status_code=503, content={"detail": f"LLM indisponible pour l'instant, réessayez plus tard. ({error})"})
+
 
 @app.middleware("http")
 async def no_cache_for_pages(request: Request, call_next: Callable) -> Response:
@@ -164,6 +170,21 @@ def run_ingest() -> dict:
     """Réindexe les documents de marque dans ChromaDB."""
     chunks = ingest()
     return {"chunks": len(chunks), "documents": len({c.source for c in chunks})}
+
+
+SUGGESTIONS = [
+    "Quel est le degré de la Saison Démo ?",
+    "Quels houblons dans la Blonde Démo ?",
+    "Avez-vous le label Biogarantie ?",
+    "Quel est le minimum de commande ?",
+    "Quel est le prix de la Blonde ?",
+]
+
+
+@app.get("/api/suggestions")
+def suggestions() -> list[str]:
+    """Questions proposées dans la vue Base de connaissances (pré-calculées dans le site statique)."""
+    return SUGGESTIONS
 
 
 @app.post("/api/ask")

@@ -1,0 +1,78 @@
+{
+  "n_articles": 5,
+  "termes": [
+    [
+      "bières",
+      4
+    ],
+    [
+      "bio",
+      3
+    ],
+    [
+      "cafés",
+      2
+    ],
+    [
+      "terrasse",
+      2
+    ],
+    [
+      "bière",
+      2
+    ],
+    [
+      "saison",
+      2
+    ],
+    [
+      "artisanales",
+      2
+    ],
+    [
+      "auprès",
+      1
+    ],
+    [
+      "demandent",
+      1
+    ],
+    [
+      "citées",
+      1
+    ],
+    [
+      "menée",
+      1
+    ],
+    [
+      "clients",
+      1
+    ]
+  ],
+  "expressions": [],
+  "mentions": [
+    {
+      "terme": "bière bio CHR",
+      "type": "mot-clé",
+      "articles": []
+    },
+    {
+      "terme": "brasserie artisanale tendance",
+      "type": "mot-clé",
+      "articles": []
+    },
+    {
+      "terme": "bière sans alcool artisanale",
+      "type": "mot-clé",
+      "articles": []
+    },
+    {
+      "terme": "Brasserie Exemple",
+      "type": "concurrent",
+      "articles": [
+        "La Brasserie Exemple lance une bière bio au sureau pour les terrasses"
+      ]
+    }
+  ]
+}

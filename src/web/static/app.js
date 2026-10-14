@@ -15,7 +15,7 @@ const JOURS = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
 const state = {
   article: null, // URL de l'article choisi dans l'atelier
   personas: new Set(Object.keys(PERSONAS)),
-  revueFilter: "brouillon",
+  revueFilter: window.COPILOTE_STATIC === true ? "tous" : "brouillon", // démo en ligne : pas de brouillon à relire
   qa: [],
   lastGenerated: [],
 };
@@ -39,7 +39,36 @@ function h(tag, props = {}, ...children) {
   return el;
 }
 
+// Site statique (Netlify) : pas de serveur Python. Les lectures viennent de fichiers JSON
+// pré-générés par `python -m src.cli export-site`, les actions sont désactivées.
+const STATIC_SITE = window.COPILOTE_STATIC === true;
+const REPO_URL = "https://github.com/clement-rubin/copilote-marketing-brasserie";
+
+/** "/api/posts?statut=brouillon" -> "/data/api/posts__statut_brouillon.json" (même règle que l'export). */
+function staticPath(path) {
+  return "/data" + path.replace("?", "__").replace(/[=&]/g, "_") + ".json";
+}
+
+async function staticApi(method, path, body) {
+  if (method === "GET") {
+    const response = await fetch(staticPath(path));
+    if (!response.ok) throw new Error("Donnée absente de la démo en ligne.");
+    return response.json();
+  }
+  if (path === "/api/ask") {
+    const answers = await (await fetch("/data/ask.json")).json();
+    return answers[body.question.trim()] || {
+      reponse: "Dans la démo en ligne, seules les questions suggérées ont une réponse (pré-calculée avec le vrai LLM). Pour poser vos propres questions, lancez le projet en local.",
+      sources_utilisees: [],
+      avertissements: ["Démo en lecture seule"],
+    };
+  }
+  if (path === "/api/eval") return (await fetch("/data/eval.json")).json();
+  throw new Error("Démo en ligne en lecture seule : cette action demande le serveur Python. Le dépôt GitHub explique comment le lancer en 5 commandes.");
+}
+
 async function api(method, path, body) {
+  if (STATIC_SITE) return staticApi(method, path, body);
   const response = await fetch(path, {
     method,
     headers: body ? { "Content-Type": "application/json" } : {},
@@ -440,7 +469,7 @@ const views = {
     };
     const send = actionButton("Demander", "primary", () => askQuestion(input.value), "Recherche…");
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") send.click(); });
-    const suggestions = ["Quel est le degré de la Saison Démo ?", "Quels houblons dans la Blonde Démo ?", "Avez-vous le label Biogarantie ?", "Quel est le minimum de commande ?", "Quel est le prix de la Blonde ?"];
+    const suggestions = await api("GET", "/api/suggestions");
     root.append(...stagger([
       h("div", { class: "ask" }, input, send),
       h("div", { class: "suggestions" }, suggestions.map((s) => h("button", { type: "button", onclick: () => { input.value = s; send.click(); } }, s))),
@@ -497,6 +526,16 @@ async function render() {
   }
   refreshBadge();
 }
+
+function staticBanner(meta) {
+  const banner = h("div", { class: "static-banner", role: "note" },
+    h("b", {}, "Démo en ligne, en lecture seule. "),
+    `Données réelles générées avec ${meta.llm} le ${meta.date}. Les actions demandent le serveur Python : `,
+    h("a", { href: REPO_URL, target: "_blank", rel: "noopener" }, "code et installation sur GitHub ↗"));
+  document.body.prepend(banner);
+}
+
+if (STATIC_SITE) fetch("/data/meta.json").then((r) => r.json()).then(staticBanner).catch(() => {});
 
 window.addEventListener("hashchange", () => {
   if (window.tourNavigating) return; // la visite guidée déclenche elle-même le rendu et l'attend

@@ -57,3 +57,15 @@ def test_ask_and_trends(isolated):
 def test_unknown_post_and_image_path_traversal(isolated):
     assert client.get("/api/posts/inexistant").status_code == 404
     assert client.get("/images/..%2F..%2F.env").status_code == 404
+
+
+def test_llm_outage_returns_readable_503(isolated, monkeypatch):
+    from src.llm import LLMError
+
+    def unavailable(*args, **kwargs):
+        raise LLMError("Gemini : 503 UNAVAILABLE")
+
+    monkeypatch.setattr("src.web.app.ask", unavailable)
+    response = client.post("/api/ask", json={"question": "Degré de la Saison ?"})
+    assert response.status_code == 503
+    assert "LLM indisponible" in response.json()["detail"]

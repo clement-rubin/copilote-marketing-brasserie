@@ -169,6 +169,18 @@ def ui(port: int = typer.Option(8765, help="Port local de l'interface web.")) ->
     uvicorn.run("src.web.app:app", host="127.0.0.1", port=port, log_level="warning")
 
 
+@app.command("export-site")
+def export_site(
+    dest: Path = typer.Option(config.ROOT / "site", help="Dossier du site statique."),
+    llm: bool = typer.Option(True, help="Pré-calculer réponses et évaluation avec le LLM configuré."),
+) -> None:
+    """Exporte l'interface en site statique en lecture seule (Netlify), avec un instantané des données."""
+    from src.web.export_static import export_site as run_export
+
+    summary = run_export(dest, with_llm=llm)
+    console.print(f"[green]Site statique prêt :[/green] {dest}  {summary}")
+
+
 @app.command("list")
 def list_command(statut: Status = typer.Option(None, help="Filtrer par statut.")) -> None:
     """Liste les posts et leur statut."""

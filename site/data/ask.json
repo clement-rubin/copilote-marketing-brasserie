@@ -1,0 +1,40 @@
+{
+  "Quel est le degré de la Saison Démo ?": {
+    "reponse": "La Saison Démo affiche un degré d'alcool de 5,8 % vol.",
+    "sources_utilisees": [
+      "05_fiche_saison_demo.md"
+    ],
+    "avertissements": []
+  },
+  "Quels houblons dans la Blonde Démo ?": {
+    "reponse": "La Blonde Démo est brassée avec des houblons certifiés bio de variétés Saaz et Hallertau Mittelfrüh.",
+    "sources_utilisees": [
+      "03_fiche_blonde_demo.md"
+    ],
+    "avertissements": []
+  },
+  "Avez-vous le label Biogarantie ?": {
+    "reponse": "Non, la Brasserie Démo du Hainaut n'est pas labellisée Biogarantie. Nous portons l'Eurofeuille sur notre gamme permanente, certifiée bio selon le règlement européen depuis 2017. Une candidature pour le label Biogarantie est actuellement à l'étude pour 2027.",
+    "sources_utilisees": [
+      "06_labels_bio.md",
+      "01_histoire.md"
+    ],
+    "avertissements": []
+  },
+  "Quel est le minimum de commande ?": {
+    "reponse": "Le minimum de commande pour les revendeurs est fixé à 4 caisses de 24 bouteilles, toutes références confondues.",
+    "sources_utilisees": [
+      "08_faq_distributeurs.md"
+    ],
+    "avertissements": []
+  },
+  "Quel est le prix de la Blonde ?": {
+    "reponse": "Je ne trouve pas cette information dans la documentation.",
+    "sources_utilisees": [
+      "03_fiche_blonde_demo.md"
+    ],
+    "avertissements": [
+      "Le prix de vente de la Blonde Démo est absent des documents fournis."
+    ]
+  }
+}

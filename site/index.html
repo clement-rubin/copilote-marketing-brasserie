@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Copilote Marketing · Brasserie Démo du Hainaut</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=Bricolage+Grotesque:opsz,wght@12..96,300..700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='15' fill='%2323412F'/><text x='16' y='22' text-anchor='middle' font-size='16' fill='%23F0C27A' font-family='serif'>B</text></svg>">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <aside class="rail">
+    <a class="seal" href="#/tableau" aria-label="Accueil">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <defs><path id="ring" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
+        <circle cx="60" cy="60" r="56" class="seal-outer"/>
+        <circle cx="60" cy="60" r="34" class="seal-inner"/>
+        <text class="seal-ring"><textPath href="#ring">BRASSERIE DÉMO DU HAINAUT · BIO ·</textPath></text>
+        <text x="60" y="58" text-anchor="middle" class="seal-mark">Copilote</text>
+        <text x="60" y="74" text-anchor="middle" class="seal-sub">marketing</text>
+      </svg>
+    </a>
+
+    <nav class="nav" aria-label="Sections">
+      <a href="#/tableau" data-view="tableau"><span class="num">01</span>Tableau de bord</a>
+      <a href="#/veille" data-view="veille"><span class="num">02</span>Veille &amp; tendances</a>
+      <a href="#/atelier" data-view="atelier"><span class="num">03</span>Atelier de contenu</a>
+      <a href="#/revue" data-view="revue"><span class="num">04</span>Revue <em class="badge" id="badge-revue"></em></a>
+      <a href="#/calendrier" data-view="calendrier"><span class="num">05</span>Calendrier</a>
+      <a href="#/savoir" data-view="savoir"><span class="num">06</span>Base de connaissances</a>
+      <a href="#/controle" data-view="controle"><span class="num">07</span>Contrôle qualité</a>
+    </nav>
+
+    <button class="tour-launch" id="tour-launch" type="button">
+      <span aria-hidden="true">?</span> Visite guidée
+    </button>
+
+    <div class="rail-foot" id="config-chips"></div>
+  </aside>
+
+  <main id="view" class="view" tabindex="-1"></main>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+  <script>window.COPILOTE_STATIC = true;</script>
+  <script src="/static/app.js"></script>
+  <script src="/static/tour.js"></script>
+</body>
+</html>

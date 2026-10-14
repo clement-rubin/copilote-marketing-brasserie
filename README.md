@@ -78,11 +78,30 @@ flowchart LR
 | `src/publish.py`, `src/social.py`, `src/orchestrate.py` | Calendrier, publication (mock et API réelles), flux hebdomadaire |
 | `src/demo.py` | Réponses du mode démo (sans LLM) |
 | `src/cli.py` | Interface en ligne de commande |
-| `src/web/` | Interface web : API REST FastAPI + page HTML/CSS/JS |
+| `src/web/` | Interface web : API REST FastAPI + page HTML/CSS/JS ; `export_static.py` produit le site Netlify |
 
 Le design initial est dans [docs/superpowers/specs/](docs/superpowers/specs/2026-10-13-copilote-marketing-design.md).
 
 ---
+
+## Démo en ligne (Netlify)
+
+Une version **en lecture seule** de l'interface est publiée sur Netlify : vraie interface, vraie visite guidée, et un instantané de **vraies données générées avec Gemini** (veille, posts relus, calendrier). Les réponses aux questions suggérées et l'évaluation y sont pré-calculées avec le LLM.
+
+Pourquoi en lecture seule :
+- Netlify n'héberge que du statique : il ne peut pas faire tourner le serveur Python (FastAPI, ChromaDB, modèle d'embedding) ;
+- une clé LLM ne doit jamais être exposée sur un site public (n'importe qui pourrait épuiser le quota).
+
+Les boutons d'action affichent donc un message qui renvoie ici. Pour tout faire fonctionner, il faut lancer le projet en local (5 commandes ci-dessous).
+
+Régénérer puis redéployer le site :
+
+```bash
+python -m src.cli export-site      # écrit site/ : interface + data/*.json + visuels
+git add site && git commit -m "Mise à jour de la démo en ligne" && git push   # Netlify redéploie
+```
+
+`netlify.toml` publie le dossier `site/` tel quel, sans étape de build, avec des en-têtes de sécurité. Un test (`tests/test_export_static.py`) vérifie que chaque lecture faite par l'interface a bien son fichier exporté, et que le contexte RAG complet n'est jamais publié.
 
 ## Installation en 5 commandes
 
@@ -172,7 +191,7 @@ Dans `.env` :
 ```ini
 LLM_PROVIDER=gemini            # ou openai, anthropic
 GEMINI_API_KEY=...             # clé gratuite sur Google AI Studio
-GEMINI_MODEL=gemini-3.1-flash-lite,gemini-3.8-flash   # le 2e sert de secours si le 1er est saturé
+GEMINI_MODEL=gemini-3.1-flash-lite,gemini-flash-lite-latest,gemini-3.8-flash   # secours dans l'ordre
 IMAGE_PROVIDER=openai          # DALL-E 3 / gpt-image, avec OPENAI_API_KEY
 IMAGE_MODEL=dall-e-3
 PUBLISH_MODE=live              # + tokens LinkedIn / Meta, voir plus bas
@@ -183,7 +202,7 @@ Aucun nom de modèle n'est écrit dans le code. Chaque appel a un délai maximal
 ### Tests et évaluation
 
 ```bash
-python -m pytest            # 82 tests, sans réseau ni clé (API sociales simulées, API web via TestClient)
+python -m pytest            # 85 tests, sans réseau ni clé (API sociales simulées, API web via TestClient)
 python -m tests.eval        # mini-évaluation sur 10 cas avec le LLM configuré
 ```
 
@@ -337,6 +356,8 @@ copilote-marketing/
   src/                   code (voir le tableau des modules)
   tests/                 76 tests + eval.py
   out/examples/          exemples de sortie (2 LinkedIn, 1 Instagram, 1 programmation)
+  site/                  site statique publié sur Netlify (généré par export-site)
+  netlify.toml           configuration Netlify
   demo.ps1               démo guidée
   docs/                  spec de design
 ```

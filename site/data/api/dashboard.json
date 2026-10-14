@@ -1,0 +1,149 @@
+{
+  "config": {
+    "llm": "gemini",
+    "modeles": [
+      "gemini-3.1-flash-lite",
+      "gemini-flash-lite-latest",
+      "gemini-3.8-flash"
+    ],
+    "images": "placeholder",
+    "publication": "mock",
+    "statique": true
+  },
+  "chunks": 51,
+  "articles": 5,
+  "statuts": {
+    "brouillon": 0,
+    "approuve": 0,
+    "rejete": 1,
+    "programme": 3,
+    "publie": 0
+  },
+  "prochains": [
+    {
+      "id": "763bb3bc",
+      "persona": "expertise_bio",
+      "plateforme": "linkedin",
+      "texte": "Vos clients vous demandent de plus en plus d'où vient ce qu'ils boivent ? Bonne nouvelle : sur la transparence, nous avons des réponses précises.\n\nChez la Brasserie Démo du Hainaut, nous avons fait le choix du bio dès 2017. Concrètement, cela signifie que toutes les bières de notre gamme permanente sont certifiées selon le règlement européen et portent le logo Eurofeuille. C'est pour vous, cavistes et gérants de CHR, une garantie simple et lisible à transmettre : au moins 95 % de nos ingrédients d'origine agricole proviennent de l'agriculture biologique.\n\nAu-delà du logo, c'est une approche que nous portons depuis nos débuts, bien avant que la demande ne devienne une tendance de fond. Si vous souhaitez découvrir notre gamme permanente et échanger sur les spécificités de nos recettes, passons au concret autour d'une dégustation.",
+      "hashtags": [
+        "#BrasserieArtisanale",
+        "#Bio",
+        "#Hainaut"
+      ],
+      "sources_utilisees": [
+        "06_labels_bio.md",
+        "01_histoire.md"
+      ],
+      "score_confiance": 1.0,
+      "score_llm": 1.0,
+      "avertissements": [],
+      "article_url": "https://example.org/actu/cavistes-bio-locales",
+      "genere_par": "gemini:gemini-3.1-flash-lite",
+      "prompt_image": "Sujet : gros plan sur des grains d'orge et des cônes de houblon dans des mains de brasseur, champ d'orge flou en arrière-plan.\nStyle : photographie documentaire, argentique 35 mm, lumière naturelle chaude de fin d'après-midi, grain léger, profondeur de champ faible.\nPalette : ambre, cuivre, vert sauge, bois brut, briques rouges du Hainaut, blanc cassé.\nComposition : sujet principal sur un tiers, espace négatif pour le texte du post, pas de texte dans l'image.\nFormat : 1.91:1.\nÀ éviter : texte ou logo inventé sur les étiquettes, marques réelles, personnes en état d'ivresse, personnes ayant l'air mineures, verres qui débordent, rendu plastique ou trop saturé, décor de pub industrielle, mains déformées.\nMidjourney : gros plan sur des grains d'orge et des cônes de houblon dans des mains de brasseur, champ d'orge flou en arrière-plan, photographie documentaire, argentique 35 mm, lumière naturelle chaude de fin d'après-midi, grain léger, profondeur de champ faible, palette ambre, cuivre, vert sauge, bois brut, briques rouges du Hainaut, blanc cassé --ar 1.91:1 --style raw --no text, logo, watermark",
+      "image_path": "C:\\dev\\copilote-marketing\\out\\images\\763bb3bc.svg",
+      "image_url": null,
+      "publications": {},
+      "statut": "programme",
+      "cree_le": "2026-10-14T09:14:31.249209",
+      "programme_le": "2026-10-20T09:00:00",
+      "note_revue": "Édité par un humain : superlatif « meilleur argument » retiré (signalé par le garde-fou) ; « toutes nos bières » précisé en « gamme permanente » (les éditions saisonnières ne sont pas toujours bio).",
+      "image_web": "/images/763bb3bc.svg"
+    },
+    {
+      "id": "bd0f9b9e",
+      "persona": "mise_en_avant_distributeur",
+      "plateforme": "linkedin",
+      "texte": "Les consommateurs sont de plus en plus nombreux à chercher du sens derrière les étiquettes et à privilégier les circuits courts pour leurs achats. Chez Brasserie Démo du Hainaut, nous constatons cette évolution au quotidien grâce à nos partenaires comme la Cave « Le Tonneau Démo » à Mons. Caviste indépendant travaillant avec nous depuis 2018, ils ont su intégrer nos bières certifiées bio dans leur sélection, tout en animant la vie locale avec leur soirée de dégustation organisée chaque premier vendredi du mois.\n\nLe rôle des cavistes va bien au-delà de la simple mise en rayon. Ils agissent comme de véritables ambassadeurs de notre travail. Avant chaque première commande, nous proposons systématiquement une dégustation de notre gamme, afin que le caviste puisse s'approprier l'histoire de nos bières et conseiller au mieux sa clientèle sur nos références, comme notre Ambrée Démo.\n\nSi vous passez par Mons, faites un détour par la boutique du Tonneau Démo. Vous y découvrirez une sélection soignée et pourrez échanger avec des passionnés. C'est en soutenant ces points de vente locaux que nous faisons vivre le savoir-faire brassicole de notre région. Merci à toute l'équipe pour leur confiance et leur implication depuis toutes ces années.",
+      "hashtags": [
+        "#BrasserieDemoDuHainaut",
+        "#ConsommerLocal",
+        "#Mons"
+      ],
+      "sources_utilisees": [
+        "01_histoire.md",
+        "04_fiche_ambree_demo.md",
+        "06_labels_bio.md",
+        "08_faq_distributeurs.md"
+      ],
+      "score_confiance": 0.95,
+      "score_llm": 0.95,
+      "avertissements": [
+        "Vérifier l'accord écrit du partenaire avant publication"
+      ],
+      "article_url": "https://example.org/actu/cavistes-bio-locales",
+      "genere_par": "gemini:gemini-3.1-flash-lite",
+      "prompt_image": "Sujet : façade et vitrine d'une petite cave à bières de quartier, étagères en bois avec des bouteilles sans étiquette lisible, caviste souriant derrière le comptoir, au premier plan un verre de bière ambrée cuivrée à mousse beige.\nStyle : photographie documentaire, argentique 35 mm, lumière naturelle chaude de fin d'après-midi, grain léger, profondeur de champ faible.\nPalette : ambre, cuivre, vert sauge, bois brut, briques rouges du Hainaut, blanc cassé.\nComposition : sujet principal sur un tiers, espace négatif pour le texte du post, pas de texte dans l'image.\nFormat : 1.91:1.\nÀ éviter : texte ou logo inventé sur les étiquettes, marques réelles, personnes en état d'ivresse, personnes ayant l'air mineures, verres qui débordent, rendu plastique ou trop saturé, décor de pub industrielle, mains déformées.\nMidjourney : façade et vitrine d'une petite cave à bières de quartier, étagères en bois avec des bouteilles sans étiquette lisible, caviste souriant derrière le comptoir, au premier plan un verre de bière ambrée cuivrée à mousse beige, photographie documentaire, argentique 35 mm, lumière naturelle chaude de fin d'après-midi, grain léger, profondeur de champ faible, palette ambre, cuivre, vert sauge, bois brut, briques rouges du Hainaut, blanc cassé --ar 1.91:1 --style raw --no text, logo, watermark",
+      "image_path": "C:\\dev\\copilote-marketing\\out\\images\\bd0f9b9e.svg",
+      "image_url": null,
+      "publications": {},
+      "statut": "programme",
+      "cree_le": "2026-10-14T09:14:40.549135",
+      "programme_le": "2026-10-22T09:00:00",
+      "note_revue": "Relu : faits conformes à la FAQ. Accord écrit du partenaire à obtenir avant publication.",
+      "image_web": "/images/bd0f9b9e.svg"
+    },
+    {
+      "id": "5d508a58",
+      "persona": "instagram_craft",
+      "plateforme": "instagram",
+      "texte": "Tu cherches une bière brassée avec des céréales certifiées bio ? Depuis 2017, c'est notre seule façon de travailler. Passe donc nous voir ce jeudi soir à la grange pour une dégustation, on t'attend pour échanger autour d'un verre 🍻 À consommer avec modération.",
+      "hashtags": [
+        "#BrasserieDemoDuHainaut",
+        "#BiereBio",
+        "#BiereArtisanale",
+        "#CraftBeer",
+        "#Hainaut"
+      ],
+      "sources_utilisees": [
+        "01_histoire.md",
+        "06_labels_bio.md"
+      ],
+      "score_confiance": 1.0,
+      "score_llm": 1.0,
+      "avertissements": [],
+      "article_url": "https://example.org/actu/cavistes-bio-locales",
+      "genere_par": "gemini:gemini-3.1-flash-lite",
+      "prompt_image": "Sujet : table en bois dans une grange le soir, guirlandes lumineuses, deux verres de bière à moitié pleins, mousse fine, ambiance conviviale et calme.\nStyle : photographie documentaire, argentique 35 mm, lumière naturelle chaude de fin d'après-midi, grain léger, profondeur de champ faible.\nPalette : ambre, cuivre, vert sauge, bois brut, briques rouges du Hainaut, blanc cassé.\nComposition : sujet principal sur un tiers, espace négatif pour le texte du post, pas de texte dans l'image.\nFormat : 4:5.\nÀ éviter : texte ou logo inventé sur les étiquettes, marques réelles, personnes en état d'ivresse, personnes ayant l'air mineures, verres qui débordent, rendu plastique ou trop saturé, décor de pub industrielle, mains déformées.\nMidjourney : table en bois dans une grange le soir, guirlandes lumineuses, deux verres de bière à moitié pleins, mousse fine, ambiance conviviale et calme, photographie documentaire, argentique 35 mm, lumière naturelle chaude de fin d'après-midi, grain léger, profondeur de champ faible, palette ambre, cuivre, vert sauge, bois brut, briques rouges du Hainaut, blanc cassé --ar 4:5 --style raw --no text, logo, watermark",
+      "image_path": "C:\\dev\\copilote-marketing\\out\\images\\5d508a58.svg",
+      "image_url": null,
+      "publications": {},
+      "statut": "programme",
+      "cree_le": "2026-10-14T09:14:42.197463",
+      "programme_le": "2026-10-24T11:00:00",
+      "note_revue": "Édité par un humain : émoji ajouté (charte : 1 à 3 sur Instagram).",
+      "image_web": "/images/5d508a58.svg"
+    }
+  ],
+  "tendances": [
+    [
+      "bières",
+      4
+    ],
+    [
+      "bio",
+      3
+    ],
+    [
+      "cafés",
+      2
+    ],
+    [
+      "terrasse",
+      2
+    ],
+    [
+      "bière",
+      2
+    ],
+    [
+      "saison",
+      2
+    ]
+  ],
+  "concurrents": [
+    {
+      "terme": "Brasserie Exemple",
+      "mentions": 1
+    }
+  ]
+}

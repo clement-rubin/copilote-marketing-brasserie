@@ -22,7 +22,7 @@ const TOUR_STEPS = [
     title: "Bienvenue dans le Copilote Marketing",
     text: (cfg) => `En 2 minutes, voici comment l'outil transforme l'actualité du marché en 3 posts par semaine, fidèles au ton de la brasserie, validés par un humain puis publiés. ${isDemo(cfg)
       ? "Vous êtes en mode démo : tout tourne hors ligne, sans clé ni coût."
-      : `Les textes sont rédigés en direct par ${llmLabel(cfg)}.`} La visite suit le plan sur 3 mois du cahier des charges.`,
+      : `Les textes sont rédigés par ${llmLabel(cfg)}.`}${cfg.statique ? " Cette version en ligne est en lecture seule : vous voyez de vraies données, mais les boutons d'action renvoient vers le dépôt GitHub." : ""} La visite suit le plan sur 3 mois du cahier des charges.`,
   },
   {
     view: "tableau", selector: ".nav",

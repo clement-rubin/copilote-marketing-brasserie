@@ -22,7 +22,7 @@ class LLMError(RuntimeError):
     """Erreur de configuration ou de réponse du LLM."""
 
 
-RETRYABLE_CODES = (429, 500, 503, 529)  # quota dépassé, erreur serveur, modèle surchargé
+RETRYABLE_CODES = (429, 500, 502, 503, 504, 529)  # quota, erreurs serveur, surcharge, délai dépassé
 FATAL_CODES = (400, 401, 403)  # requête invalide, clé absente ou refusée
 TIMEOUT_SECONDS = 60
 

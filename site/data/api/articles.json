@@ -1,0 +1,62 @@
+[
+  {
+    "url": "https://example.org/actu/cavistes-bio-locales",
+    "titre": "Les cavistes indépendants misent sur les bières bio locales",
+    "flux": "Flux démo (fictif)",
+    "theme": "demo",
+    "publie_le": "2026-10-12T07:00:00",
+    "collecte_le": "2026-10-14T09:04:37.654446",
+    "extrait": "Article fictif. Une enquête menée auprès de cavistes indépendants indique que les clients demandent de plus en plus l'origine des matières premières. Les bières bio produites près de chez eux sont citées comme un argument de vente facile à expliquer.",
+    "resume": "Une enquête auprès de cavistes indépendants révèle une demande accrue des clients pour connaître l'origine des matières premières. Les bières certifiées bio produites à proximité constituent un argument de vente jugé simple à présenter. L'extrait fourni est court, mais il souligne cette tendance vers la consommation locale.",
+    "pertinence": "Cette évolution des attentes confirme que notre positionnement en tant que brasserie artisanale bio locale répond directement aux besoins actuels des clients de nos partenaires. Cela renforce l'intérêt de mettre en avant notre ancrage territorial et nos méthodes de production lors de nos échanges avec les cavistes et les gérants de CHR.",
+    "utilise": true
+  },
+  {
+    "url": "https://example.org/actu/horeca-futs-terrasse",
+    "titre": "Horeca : le retour des fûts de bière artisanale en terrasse",
+    "flux": "Flux démo (fictif)",
+    "theme": "demo",
+    "publie_le": "2026-10-11T09:30:00",
+    "collecte_le": "2026-10-14T09:04:43.167859",
+    "extrait": "Article fictif. Plusieurs cafés de Wallonie élargissent leur offre de bières artisanales à la pression. Les exploitants évoquent une demande pour des bières plus légères et désaltérantes pendant la belle saison.",
+    "resume": "Des cafés en Wallonie augmentent leur sélection de bières artisanales servies à la pression. La demande des consommateurs s'oriente vers des bières légères et désaltérantes durant la saison estivale. L'extrait fourni est court et ne permet pas d'approfondir davantage cette tendance.",
+    "pertinence": "Cette évolution confirme l'intérêt croissant des établissements pour le format fût, une opportunité pour développer nos volumes auprès des cafés et restaurants. La recherche de produits désaltérants valide également l'intérêt de mettre en avant nos références les plus légères pour la terrasse.",
+    "utilise": false
+  },
+  {
+    "url": "https://example.org/actu/controle-bio",
+    "titre": "Label bio européen : ce que vérifient les organismes certificateurs",
+    "flux": "Flux démo (fictif)",
+    "theme": "demo",
+    "publie_le": "2026-10-10T08:00:00",
+    "collecte_le": "2026-10-14T09:04:44.210687",
+    "extrait": "Article fictif. Un dossier explique le déroulé d'un contrôle annuel de certification bio : traçabilité des ingrédients, factures fournisseurs, visite du site de production. Les consommateurs connaissent le logo mais rarement ce qu'il garantit.",
+    "resume": "Un article explique le déroulé des contrôles annuels liés au label bio européen. Le texte souligne que ces inspections portent sur la traçabilité des ingrédients, les factures des fournisseurs et la visite du site de production. Il note également que les consommateurs connaissent le logo sans toujours maîtriser les garanties associées.",
+    "pertinence": "Maîtriser ces points de contrôle permet de rassurer nos clients distributeurs et cavistes sur la rigueur de notre certification. Cela nous aide à mieux expliquer concrètement la valeur de notre logo bio lors des échanges avec les professionnels du secteur.",
+    "utilise": false
+  },
+  {
+    "url": "https://example.org/actu/bieres-hiver",
+    "titre": "Brasser en hiver : les brasseries artisanales préparent leurs bières de saison",
+    "flux": "Flux démo (fictif)",
+    "theme": "demo",
+    "publie_le": "2026-10-09T13:00:00",
+    "collecte_le": "2026-10-14T09:04:48.941576",
+    "extrait": "Article fictif. À l'approche de l'hiver, les petites brasseries lancent des bières plus maltées et plus rondes, souvent pensées pour accompagner les plats mijotés.",
+    "resume": "Des brasseries artisanales préparent actuellement leurs nouvelles bières en vue de la période hivernale. Ces productions se caractérisent par des profils plus maltés et plus ronds. L'extrait est toutefois très court et ne contient que peu d'informations détaillées.",
+    "pertinence": "Cette tendance saisonnière offre une opportunité pertinente pour proposer des accords mets-bières avec des plats mijotés à nos partenaires cavistes et CHR. Cela permet de renouveler l'offre auprès des clients finaux durant les mois plus froids.",
+    "utilise": false
+  },
+  {
+    "url": "https://example.org/actu/brasserie-exemple-sureau",
+    "titre": "La Brasserie Exemple lance une bière bio au sureau pour les terrasses",
+    "flux": "Flux démo (fictif)",
+    "theme": "demo",
+    "publie_le": "2026-10-08T10:00:00",
+    "collecte_le": "2026-10-14T09:04:50.251379",
+    "extrait": "Article fictif. La Brasserie Exemple (fictive), concurrente régionale, mise sur une bière bio légère aromatisée au sureau, vendue en priorité aux cafés avec terrasse. Elle annonce une campagne sur Instagram autour des bières de terrasse.",
+    "resume": "La Brasserie Exemple lance une nouvelle bière biologique aromatisée au sureau. Ce produit est principalement destiné à la consommation en terrasse. Une campagne de communication sur Instagram est prévue pour soutenir ce lancement.",
+    "pertinence": "Cette initiative montre une tendance régionale vers les bières légères et aromatisées pour le secteur CHR. Cela nous invite à réfléchir à nos propres stratégies de saisonnalité pour nos clients cafés et restaurants.",
+    "utilise": false
+  }
+]

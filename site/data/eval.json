@@ -1,0 +1,174 @@
+{
+  "cas": [
+    {
+      "case": 1,
+      "persona": "expertise_bio",
+      "article": "Les cavistes indépendants misent sur les bières bio locales",
+      "length": 763,
+      "length_ok": true,
+      "hashtags_ok": true,
+      "emojis_ok": true,
+      "unsourced": [],
+      "forbidden": [],
+      "sources": 2,
+      "confidence": 1.0,
+      "texte": "Le bio, ce n'est pas seulement un logo sur l'étiquette, c'est une sacrée tranquillité d'esprit pour vos clients. Si vos clients vous demandent ce qu'il y a vraiment dans leur verre, vous avez une réponse simple et transparente.\n\nDepuis 2017, la Brasserie Démo du Hainaut est certifiée bio. Concrètement, cela signifie que toutes nos bières de la gamme permanente respectent le règlement européen en vigueur. Vous pouvez leur expliquer que nos ingrédients issus de l'agriculture biologique garantissent un cahier des charges strict, loin des discours marketing flous. Pas de raccourcis, juste du concret.\n\nVous souhaitez enrichir votre carte avec des bières certifiées bio ? Nous serions ravis d'échanger avec vous sur notre gamme lors d'une prochaine dégustation.",
+      "passed": true
+    },
+    {
+      "case": 2,
+      "persona": "coulisses_brassage",
+      "article": "Les cavistes indépendants misent sur les bières bio locales",
+      "length": 983,
+      "length_ok": true,
+      "hashtags_ok": true,
+      "emojis_ok": true,
+      "unsourced": [],
+      "forbidden": [],
+      "sources": 3,
+      "confidence": 1.0,
+      "texte": "6 heures du matin. Le concassage du malt commence, c'est le signal de départ d'une longue journée. Dans notre brasserie, l'empâtage, l'ébullition et l'ajout de levure se succèdent pour transformer nos matières premières bio en bières refermentées en bouteille. \n\nDepuis 2017, le choix du bio fait partie de notre identité, une démarche qui a commencé par le souhait de travailler directement avec des agriculteurs. Aujourd'hui, nous constatons que la traçabilité et l'origine des ingrédients sont des points de plus en plus discutés par vos clients en boutique ou en établissement. \n\nNos bières permanentes portent fièrement l'Eurofeuille, un repère simple pour les amateurs qui cherchent du sens dans leur verre. Nous ne pasteurisons rien et nous privilégions la refermentation, un choix qui demande une gestion de stock rigoureuse, mais qui garantit le caractère de nos brassins. \n\nComment accompagnez-vous vos clients dans leur choix de bières bio au sein de votre établissement ?",
+      "passed": true
+    },
+    {
+      "case": 3,
+      "persona": "mise_en_avant_distributeur",
+      "article": "Les cavistes indépendants misent sur les bières bio locales",
+      "length": 1219,
+      "length_ok": true,
+      "hashtags_ok": true,
+      "emojis_ok": true,
+      "unsourced": [],
+      "forbidden": [],
+      "sources": 3,
+      "confidence": 1.0,
+      "texte": "Les consommateurs s'interrogent de plus en plus sur l'origine des ingrédients dans leur verre. Pour répondre à cette attente, rien ne remplace le conseil d'un professionnel passionné. Nous souhaitons aujourd'hui mettre en lumière la Cave « Le Tonneau Démo » à Mons. Ce caviste indépendant, partenaire de la brasserie depuis 2018, fait un travail quotidien pour expliquer le choix de nos bières certifiées bio depuis 2017. Merci à eux pour leur engagement.\n\nPourquoi ces acteurs sont-ils essentiels ? Parce que nous ne voulons pas seulement vendre des bouteilles. Nous proposons systématiquement une dégustation à nos revendeurs avant toute première commande. Les cavistes et les gérants de CHR sont les premiers ambassadeurs de notre démarche et de la qualité de notre production locale. Ils connaissent nos bières, savent les conseiller et permettent à notre brasserie de rester proche de celles et ceux qui les boivent.\n\nSi vous passez par Mons, n'hésitez pas à franchir la porte du « Tonneau Démo ». C'est l'occasion idéale pour découvrir leur sélection et échanger avec des professionnels qui connaissent parfaitement leur métier. Ils organisent d'ailleurs régulièrement des soirées de dégustation de bières belges.",
+      "passed": true
+    },
+    {
+      "case": 4,
+      "persona": "instagram_craft",
+      "article": "Les cavistes indépendants misent sur les bières bio locales",
+      "length": 329,
+      "length_ok": true,
+      "hashtags_ok": true,
+      "emojis_ok": true,
+      "unsourced": [],
+      "forbidden": [],
+      "sources": 2,
+      "confidence": 0.9,
+      "texte": "Tu cherches une bière dont l'origine est claire ? 🌾 Nos bières de la gamme permanente sont certifiées bio. On ne pasteurise pas, on refermente en bouteille. Passe nous voir jeudi soir à la grange pour une dégustation sans réservation. L'occasion de discuter de nos choix avec toi autour d'un verre. 🍻 À consommer avec modération.",
+      "passed": true
+    },
+    {
+      "case": 5,
+      "persona": "expertise_bio",
+      "article": "Horeca : le retour des fûts de bière artisanale en terrasse",
+      "length": 900,
+      "length_ok": true,
+      "hashtags_ok": true,
+      "emojis_ok": true,
+      "unsourced": [],
+      "forbidden": [],
+      "sources": 2,
+      "confidence": 0.9,
+      "texte": "Les terrasses chauffent, vos clients ont soif, et ce n'est pas le moment de les décevoir avec une carte sans âme. En tant que gérant d'établissement, vous savez que la transparence est devenue un argument de vente aussi solide que le malt dans nos cuves.\n\nChez la Brasserie Démo du Hainaut, nous sommes certifiés bio depuis 2017. Concrètement, cela signifie que nos bières portent l'Eurofeuille, garantissant qu'au moins 95 % de nos ingrédients agricoles sont issus de l'agriculture biologique. C'est simple, c'est tracé, et c'est ce que vos clients attendent quand ils demandent une boisson artisanale.\n\nPlutôt que de longs discours sur la complexité du cahier des charges, dites simplement à vos clients que le bio, c'est le choix de la traçabilité. Vous voulez goûter notre gamme pour vos prochaines mises en fût ? Passez nous voir à la grange ce jeudi soir pour une dégustation, sans réservation.",
+      "passed": true
+    },
+    {
+      "case": 6,
+      "persona": "coulisses_brassage",
+      "article": "Horeca : le retour des fûts de bière artisanale en terrasse",
+      "length": 849,
+      "length_ok": true,
+      "hashtags_ok": true,
+      "emojis_ok": true,
+      "unsourced": [],
+      "forbidden": [],
+      "sources": 4,
+      "confidence": 0.9,
+      "texte": "6 heures du matin, la journée commence à la brasserie. Entre le concassage du malt et l'empâtage, nos gestes sont répétés, précis. La vapeur monte dans la grange, les odeurs des céréales remplissent l'espace. Nous brassons aujourd'hui notre Saison Démo, certifiée biologique, qui sera disponible en fût de 20 litres, en plus des bouteilles habituelles. Avec le retour des beaux jours, nous constatons que la demande pour des bières de caractère, mais digestes, se fait sentir en terrasse. Le format fût de 20 litres permet de répondre à cette attente tout en préservant le savoir-faire de notre bière refermentée, sans pasteurisation. Nos verres siglés accompagnent les établissements partenaires qui choisissent de mettre nos fûts à la pression. Comment gérez-vous la rotation de vos bières artisanales à la pression durant cette période estivale ?",
+      "passed": true
+    },
+    {
+      "case": 7,
+      "persona": "mise_en_avant_distributeur",
+      "article": "Horeca : le retour des fûts de bière artisanale en terrasse",
+      "length": 1256,
+      "length_ok": true,
+      "hashtags_ok": true,
+      "emojis_ok": true,
+      "unsourced": [],
+      "forbidden": [],
+      "sources": 3,
+      "confidence": 0.95,
+      "texte": "Le retour du soleil en terrasse pousse les amateurs à redécouvrir les bières de saison, légères et désaltérantes. C'est l'occasion idéale de mettre en avant un partenaire de longue date : le café « L'Estaminet Fictif » à Tournai. Depuis 2021, cet établissement propose notre Saison Démo en fût pour le plus grand plaisir des passants qui profitent de sa terrasse située sur la place. Nous sommes ravis de voir notre production accompagner ces moments de convivialité estivale.\n\nPour nous, les cavistes et les établissements CHR sont bien plus que des points de vente : ils sont les ambassadeurs de notre travail. Nous tenons à ce que chaque partenaire puisse goûter l'intégralité de notre gamme avant une première commande, garantissant ainsi une connaissance réelle de ce qu'il sert. Leur rôle est essentiel pour faire découvrir nos bières non pasteurisées et refermentées en bouteille aux consommateurs curieux.\n\nSi vous passez par Tournai, n'hésitez pas à faire une halte à L'Estaminet Fictif pour tester la Saison Démo servie à la pression. Vous y trouverez un accueil authentique et un cadre parfait pour savourer une bière brassée avec notre épeautre local de Saint-Démo. Merci à toute l'équipe pour leur confiance renouvelée depuis plusieurs années.",
+      "passed": true
+    },
+    {
+      "case": 8,
+      "persona": "instagram_craft",
+      "article": "Horeca : le retour des fûts de bière artisanale en terrasse",
+      "length": 340,
+      "length_ok": true,
+      "hashtags_ok": true,
+      "emojis_ok": true,
+      "unsourced": [],
+      "forbidden": [],
+      "sources": 2,
+      "confidence": 1.0,
+      "texte": "Il fait beau, la terrasse t'appelle ! C'est le moment idéal pour goûter la Saison Démo, notre bière certifiée bio avec son épeautre local. Elle est disponible en fût pour les journées ensoleillées. Si tu préfères passer nous voir à la grange, on t'attend ce jeudi soir pour une dégustation sans réservation. 🍺 🌾 À consommer avec modération.",
+      "passed": true
+    },
+    {
+      "case": 9,
+      "persona": "expertise_bio",
+      "article": "Label bio européen : ce que vérifient les organismes certificateurs",
+      "length": 884,
+      "length_ok": true,
+      "hashtags_ok": true,
+      "emojis_ok": true,
+      "unsourced": [],
+      "forbidden": [],
+      "sources": 2,
+      "confidence": 0.95,
+      "texte": "Le logo Eurofeuille, vous le croisez tous les jours sur nos étiquettes, mais savez-vous exactement ce qu'il garantit à vos clients ?\n\nAu-delà de l'étiquette, c'est une traçabilité rigoureuse que nous appliquons depuis 2017. Chaque année, notre site de production et nos factures fournisseurs sont audités pour vérifier la conformité avec le règlement (UE) 2018/848. Concrètement, cela signifie qu'au moins 95 % de nos ingrédients agricoles, comme les malts et houblons bio de nos recettes, répondent aux exigences strictes de la certification.\n\nC'est un argument simple à transmettre : quand un client vous demande ce qu'il y a dans son verre, vous pouvez lui répondre avec transparence que nos bières sont certifiées bio. Pas de superlatifs, juste une réalité contrôlée qui assure la provenance de nos matières premières. \n\nEnvie d'en discuter de vive voix autour d'une dégustation ?",
+      "passed": true
+    },
+    {
+      "case": 10,
+      "persona": "coulisses_brassage",
+      "article": "Label bio européen : ce que vérifient les organismes certificateurs",
+      "length": 825,
+      "length_ok": true,
+      "hashtags_ok": true,
+      "emojis_ok": true,
+      "unsourced": [],
+      "forbidden": [],
+      "sources": 4,
+      "confidence": 0.95,
+      "texte": "6 heures du matin, la brasserie s'éveille. Le concassage du malt, puis l'empâtage : une routine précise pour garantir la qualité de notre production. Chez nous, la transparence n'est pas qu'un mot. En tant que brasserie certifiée bio depuis 2017, nous appliquons quotidiennement le règlement européen 2018/848. Le logo Eurofeuille sur nos bouteilles, comme sur nos Saisons Démo, n'est pas juste une étiquette, c'est la garantie que 95 % de nos ingrédients d'origine agricole sont issus de l'agriculture biologique. Lors de nos échanges avec les cavistes et partenaires, nous sommes souvent interrogés sur la réalité de ce contrôle. Au-delà des formalités, c'est une exigence de traçabilité que nous partageons avec vous. Comment abordez-vous, de votre côté, la valorisation de la certification bio auprès de votre clientèle ?",
+      "passed": true
+    }
+  ],
+  "conformes": 10,
+  "controles": [
+    {
+      "cas": "degré + label inventés",
+      "detections": [
+        "Chiffre non sourcé : 8",
+        "Label non sourcé : Demeter"
+      ]
+    },
+    {
+      "cas": "superlatifs + santé + émojis",
+      "detections": [
+        "Formule interdite par la charte : « meilleure bière »",
+        "Formule interdite par la charte : « meilleur »",
+        "Formule interdite par la charte : « incroyable »",
+        "Formule interdite par la charte : « bonne pour la santé »",
+        "16 émojis (attendu entre 1 et 3)"
+      ]
+    }
+  ]
+}

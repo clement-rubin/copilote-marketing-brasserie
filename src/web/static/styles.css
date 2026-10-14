@@ -51,6 +51,14 @@ a { color: inherit; }
 button, input, textarea, select { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 
+/* Bandeau du site statique (Netlify) */
+.static-banner {
+  grid-column: 1 / -1; position: sticky; top: 0; z-index: 30;
+  background: var(--amber); color: #2a1a06; padding: 9px 18px; font-size: 14px; text-align: center;
+}
+.static-banner a { font-weight: 600; }
+body:has(.static-banner) .rail { top: 38px; height: calc(100vh - 38px); }
+
 /* ------------------------------------------------------------------ Rail */
 
 .rail {
