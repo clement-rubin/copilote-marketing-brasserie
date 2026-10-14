@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.llm import FakeLLMClient, LLMError, complete_json, extract_json, get_llm_client
+from src.llm import FakeLLMClient, LLMError, complete_json, extract_json, get_llm_client, with_retry
 from src.models import ArticleSummary
 
 VALID = '{"resume": "Un résumé assez long pour passer.", "pertinence": "Utile pour les cavistes."}'
@@ -53,3 +53,61 @@ def test_openai_requires_key(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "")
     with pytest.raises(LLMError, match="OPENAI_API_KEY"):
         get_llm_client("openai")
+
+
+class FlakyError(Exception):
+    def __init__(self, code: int) -> None:
+        super().__init__(f"HTTP {code}")
+        self.code = code
+
+
+def test_with_retry_recovers_from_temporary_errors():
+    calls = []
+
+    def flaky():
+        calls.append(1)
+        if len(calls) < 3:
+            raise FlakyError(503)
+        return "ok"
+
+    assert with_retry(flaky, base_delay=0) == "ok"
+    assert len(calls) == 3
+
+
+def test_with_retry_does_not_retry_permanent_errors():
+    calls = []
+
+    def broken():
+        calls.append(1)
+        raise FlakyError(404)
+
+    with pytest.raises(FlakyError):
+        with_retry(broken, base_delay=0)
+    assert len(calls) == 1
+
+
+def test_gemini_falls_back_to_next_model_when_overloaded(monkeypatch):
+    """Modèle saturé (503) -> modèle suivant ; erreur définitive -> LLMError immédiate."""
+    import src.llm as llm_module
+    from src.llm import GeminiClient
+
+    monkeypatch.setattr(llm_module.time, "sleep", lambda _: None)  # pas d'attente réelle en test
+    asked = []
+
+    class FakeModels:
+        def generate_content(self, model, contents, config):
+            asked.append(model)
+            if model == "sature":
+                raise FlakyError(503)
+
+            class Response:
+                text = '{"ok": true}'
+
+            return Response()
+
+    client = object.__new__(GeminiClient)  # sans __init__ : pas de clé ni de réseau
+    client.models, client.model = ["sature", "secours"], "sature"
+    client.client = type("C", (), {"models": FakeModels()})()
+    assert client.complete("sys", "user") == '{"ok": true}'
+    assert client.model == "secours"
+    assert asked.count("sature") == 3 and asked[-1] == "secours"  # 3 essais puis repli

@@ -13,7 +13,7 @@ La Brasserie Démo du Hainaut a été fondée en 2016 par Jules Vandemo, ancien 
 
 ## Le choix du bio dès le premier jour
 
-Toutes les bières de la brasserie sont certifiées biologiques selon le règlement européen depuis 2017. Le choix du bio n'est pas venu d'une étude de marché : Jules travaillait auparavant avec des agriculteurs en conversion et voulait leur acheter leur orge.
+Les bières de la gamme permanente sont certifiées biologiques selon le règlement européen depuis 2017 (les éditions saisonnières ne le sont pas toujours). Le choix du bio n'est pas venu d'une étude de marché : Jules travaillait auparavant avec des agriculteurs en conversion et voulait leur acheter leur orge.
 
 ## La brasserie aujourd'hui
 

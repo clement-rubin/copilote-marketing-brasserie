@@ -1,26 +1,26 @@
 # Linkedin · expertise_bio
 
-- Identifiant : `5a49c62f`
+- Identifiant : `763bb3bc`
 - Statut : programme
 - Article de départ : https://example.org/actu/cavistes-bio-locales
-- Sources de marque : `06_labels_bio.md`
-- Score de confiance : 0.60
+- Sources de marque : `06_labels_bio.md`, `01_histoire.md`
+- Score de confiance : 1.00
+- Rédigé par : gemini:gemini-3.1-flash-lite
+- Note de revue humaine : Édité par un humain : superlatif « meilleur argument » retiré (signalé par le garde-fou) ; « toutes nos bières » précisé en « gamme permanente » (les éditions saisonnières ne sont pas toujours bio).
 
 ## Texte
 
-Le logo bio, tout le monde le connaît. Ce qu'il garantit, beaucoup moins.
+Vos clients vous demandent de plus en plus d'où vient ce qu'ils boivent ? Bonne nouvelle : sur la transparence, nous avons des réponses précises.
 
-Dans l'actualité cette semaine : « Les cavistes indépendants misent sur les bières bio locales ». Ça nous parle.
+Chez la Brasserie Démo du Hainaut, nous avons fait le choix du bio dès 2017. Concrètement, cela signifie que toutes les bières de notre gamme permanente sont certifiées selon le règlement européen et portent le logo Eurofeuille. C'est pour vous, cavistes et gérants de CHR, une garantie simple et lisible à transmettre : au moins 95 % de nos ingrédients d'origine agricole proviennent de l'agriculture biologique.
 
-Le logo bio européen, appelé « Eurofeuille », est obligatoire sur les produits bio préemballés de l'Union européenne. Il garantit qu'au moins 95 % des ingrédients d'origine agricole sont issus de l'agriculture biologique. La réglementation bio européenne actuelle est le règlement (UE) 2018/848, applicable depuis le 1er janvier 2022. Le logo doit être accompagné du code de l'organisme certificateur.
+Au-delà du logo, c'est une approche que nous portons depuis nos débuts, bien avant que la demande ne devienne une tendance de fond. Si vous souhaitez découvrir notre gamme permanente et échanger sur les spécificités de nos recettes, passons au concret autour d'une dégustation.
 
-Vous êtes caviste ou restaurateur ? Quelle question vos clients vous posent-ils le plus sur le bio ?
-
-#BiereBio #BiereArtisanale #CavisteIndependant
+#BrasserieArtisanale #Bio #Hainaut
 
 ## Avertissements
 
-- Texte produit en mode démo (FakeLLMClient), sans LLM réel.
+- aucun
 
 ## Prompt d'image
 

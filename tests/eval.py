@@ -19,6 +19,7 @@ from itertools import islice, product
 from pathlib import Path
 
 from rich.console import Console
+from rich.markup import escape
 from rich.table import Table
 
 from src import config, guard
@@ -45,6 +46,7 @@ class CaseResult:
     forbidden: list[str]
     sources: int
     confidence: float
+    texte: str = ""  # gardé pour afficher les cas en échec et comprendre pourquoi
 
     @property
     def passed(self) -> bool:
@@ -67,6 +69,7 @@ def evaluate(post: Post, case: int, article_title: str) -> CaseResult:
         forbidden=guard.forbidden_words(post.texte),
         sources=len(post.sources_utilisees),
         confidence=post.score_confiance,
+        texte=post.texte,
     )
 
 
@@ -129,6 +132,9 @@ def print_report(results: list[CaseResult]) -> None:
             "[green]OK[/green]" if r.passed else "[red]ÉCHEC[/red]",
         )
     console.print(table)
+    for r in results:
+        if not r.passed:
+            console.print(f"[red]Cas {r.case} en échec ({r.persona}) :[/red] {escape(r.texte)}\n")
     passed = sum(r.passed for r in results)
     mean = sum(r.confidence for r in results) / len(results)
     console.print(f"[bold]{passed}/{len(results)} cas conformes[/bold], confiance moyenne {mean:.2f}")

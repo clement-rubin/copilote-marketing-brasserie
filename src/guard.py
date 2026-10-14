@@ -48,10 +48,11 @@ FORBIDDEN = [
     "bonne pour la santé",
 ]
 
-# Règles de forme par plateforme : (longueur min, longueur max, émojis max, hashtags min, max)
+# Règles de forme par plateforme :
+# (longueur min, longueur max, émojis min, émojis max, hashtags min, hashtags max)
 FORMAT_RULES = {
-    Platform.LINKEDIN: (600, 1300, 2, 1, 3),
-    Platform.INSTAGRAM: (150, 500, 3, 5, 5),
+    Platform.LINKEDIN: (600, 1300, 0, 2, 1, 3),
+    Platform.INSTAGRAM: (150, 500, 1, 3, 5, 5),
 }
 
 PENALTY = 0.2  # baisse du score de confiance par problème de fond
@@ -84,16 +85,35 @@ def forbidden_words(text: str) -> list[str]:
     return [w for w in FORBIDDEN if w in lower]
 
 
+# Charte : tutoiement sur Instagram, vouvoiement sur LinkedIn.
+VOUVOIEMENT = re.compile(r"\b(vous|votre|vos|passez|venez|goûtez|découvrez)\b", re.IGNORECASE)
+TUTOIEMENT = re.compile(r"\b(tu|toi|ta|tes|viens)\b", re.IGNORECASE)  # pas « ton » ni « passe » : ambigus
+
+
+def register_problems(post: Post) -> list[str]:
+    """Registre contraire à la charte : vouvoiement sur Instagram, tutoiement sur LinkedIn."""
+    if post.plateforme is Platform.INSTAGRAM:
+        found = VOUVOIEMENT.findall(post.texte)
+        expected = "tutoiement"
+    else:
+        found = TUTOIEMENT.findall(post.texte)
+        expected = "vouvoiement"
+    if not found:
+        return []
+    words = ", ".join(sorted({w.lower() for w in found}))
+    return [f"Registre : « {words} » alors que la charte demande le {expected} sur {post.plateforme.value}"]
+
+
 def format_problems(post: Post) -> list[str]:
     """Problèmes de forme : longueur, nombre d'émojis, nombre de hashtags."""
-    min_len, max_len, max_emojis, min_tags, max_tags = FORMAT_RULES[post.plateforme]
+    min_len, max_len, min_emojis, max_emojis, min_tags, max_tags = FORMAT_RULES[post.plateforme]
     problems = []
     length = len(post.texte)
     if not min_len <= length <= max_len:
         problems.append(f"Longueur {length} caractères hors de [{min_len}, {max_len}]")
     emojis = len(EMOJI.findall(post.texte))
-    if emojis > max_emojis:
-        problems.append(f"{emojis} émojis (maximum {max_emojis})")
+    if not min_emojis <= emojis <= max_emojis:
+        problems.append(f"{emojis} émojis (attendu entre {min_emojis} et {max_emojis})")
     if not min_tags <= len(post.hashtags) <= max_tags:
         problems.append(f"{len(post.hashtags)} hashtags (attendu entre {min_tags} et {max_tags})")
     return problems
@@ -115,7 +135,7 @@ def check(post: Post, context: str) -> Post:
     for word in forbidden_words(post.texte):
         warnings.append(f"[garde-fou] Formule interdite par la charte : « {word} »")
     substantive = len(warnings)  # problèmes de fond : ils baissent la confiance
-    warnings += [f"[garde-fou] {p}" for p in format_problems(post)]
+    warnings += [f"[garde-fou] {p}" for p in format_problems(post) + register_problems(post)]
 
     post.avertissements = list(dict.fromkeys(previous + warnings))
     post.score_confiance = round(max(0.0, base_score - PENALTY * substantive), 2)

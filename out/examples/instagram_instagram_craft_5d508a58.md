@@ -1,20 +1,22 @@
 # Instagram · instagram_craft
 
-- Identifiant : `07d9caf8`
+- Identifiant : `5d508a58`
 - Statut : programme
 - Article de départ : https://example.org/actu/cavistes-bio-locales
-- Sources de marque : `04_fiche_ambree_demo.md`
-- Score de confiance : 0.60
+- Sources de marque : `01_histoire.md`, `06_labels_bio.md`
+- Score de confiance : 1.00
+- Rédigé par : gemini:gemini-3.1-flash-lite
+- Note de revue humaine : Édité par un humain : émoji ajouté (charte : 1 à 3 sur Instagram).
 
 ## Texte
 
-Petite pause dégustation à la grange 🍻 Aujourd'hui, on te parle d'une de nos bières. Le format 75 cl se partage et se vend bien en coffret cadeau. À consommer avec modération.
+Tu cherches une bière brassée avec des céréales certifiées bio ? Depuis 2017, c'est notre seule façon de travailler. Passe donc nous voir ce jeudi soir à la grange pour une dégustation, on t'attend pour échanger autour d'un verre 🍻 À consommer avec modération.
 
 #BrasserieDemoDuHainaut #BiereBio #BiereArtisanale #CraftBeer #Hainaut
 
 ## Avertissements
 
-- Texte produit en mode démo (FakeLLMClient), sans LLM réel.
+- aucun
 
 ## Prompt d'image
 

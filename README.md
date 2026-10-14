@@ -170,69 +170,88 @@ Les mêmes commandes peuvent être appelées depuis n8n ou Make (nœud « Execut
 Dans `.env` :
 
 ```ini
-LLM_PROVIDER=openai            # ou anthropic, gemini (quota gratuit sur Google AI Studio)
-OPENAI_API_KEY=...
-OPENAI_MODEL=...               # jamais écrit en dur dans le code
-IMAGE_PROVIDER=openai
-IMAGE_MODEL=dall-e-3           # ou gpt-image-1
+LLM_PROVIDER=gemini            # ou openai, anthropic
+GEMINI_API_KEY=...             # clé gratuite sur Google AI Studio
+GEMINI_MODEL=gemini-3.1-flash-lite,gemini-3.8-flash   # le 2e sert de secours si le 1er est saturé
+IMAGE_PROVIDER=openai          # DALL-E 3 / gpt-image, avec OPENAI_API_KEY
+IMAGE_MODEL=dall-e-3
 PUBLISH_MODE=live              # + tokens LinkedIn / Meta, voir plus bas
 ```
+
+Aucun nom de modèle n'est écrit dans le code. Chaque appel a un délai maximal de 60 s et des réessais (2 s, 4 s) sur les erreurs temporaires (429, 5xx). Avec Gemini, si un modèle est saturé, retiré ou trop lent, le suivant de la liste prend le relais.
 
 ### Tests et évaluation
 
 ```bash
-python -m pytest            # 76 tests, sans réseau ni clé (API sociales simulées, API web via TestClient)
+python -m pytest            # 82 tests, sans réseau ni clé (API sociales simulées, API web via TestClient)
 python -m tests.eval        # mini-évaluation sur 10 cas avec le LLM configuré
 ```
 
 ---
 
-## Exemple de sortie
+## Exemple de sortie (Gemini, réel)
 
-> Les exemples de [`out/examples/`](out/examples/) ont été produits par la vraie chaîne (`watch --offline` → `generate` → `review` → `schedule` → `export`) en **mode démo** : le « LLM » est le `FakeLLMClient`, qui assemble des phrases tirées des passages RAG. Le style est plus plat qu'avec un vrai modèle, mais les sorties passent par exactement le même code : parsing JSON, validation pydantic, garde-fou, prompt d'image, validation, programmation.
+Les exemples de [`out/examples/`](out/examples/) ont été produits par la vraie chaîne avec **Gemini** (`gemini-3.1-flash-lite`) : `watch` → `generate` → **relecture humaine** → `schedule` → `export`. Chaque fichier indique le modèle et la note de revue humaine.
 
-Post LinkedIn, persona « Expertise Bio » :
+Post LinkedIn, persona « Mise en avant d'un distributeur » (extrait, non retouché) :
 
 ```text
-Le logo bio, tout le monde le connaît. Ce qu'il garantit, beaucoup moins.
+Les consommateurs sont de plus en plus nombreux à chercher du sens derrière les étiquettes et à privilégier
+les circuits courts pour leurs achats. Chez Brasserie Démo du Hainaut, nous constatons cette évolution au
+quotidien grâce à nos partenaires comme la Cave « Le Tonneau Démo » à Mons. Caviste indépendant travaillant
+avec nous depuis 2018, ils ont su intégrer nos bières certifiées bio dans leur sélection, tout en animant la
+vie locale avec leur soirée de dégustation organisée chaque premier vendredi du mois. [...]
 
-Dans l'actualité cette semaine : « Les cavistes indépendants misent sur les bières bio locales ». Ça nous parle.
-
-Le logo bio européen, appelé « Eurofeuille », est obligatoire sur les produits bio préemballés de l'Union
-européenne. Il garantit qu'au moins 95 % des ingrédients d'origine agricole sont issus de l'agriculture
-biologique. [...]
-
-Vous êtes caviste ou restaurateur ? Quelle question vos clients vous posent-ils le plus sur le bio ?
-
-#BiereBio #BiereArtisanale #CavisteIndependant
-
-Sources : 06_labels_bio.md · Confiance : 0.60 · Statut : programmé mar. 20/10/2026 09h00
+Sources : 08_faq_distributeurs.md, 01_histoire.md, … · Avertissement : « Vérifier l'accord écrit du partenaire »
 ```
 
-Base de connaissances (`ask`) :
+Légende Instagram (tutoiement, 5 hashtags) :
 
 ```text
-Q : Quel est le degré de la Saison Démo ?     → Degré d'alcool : 5,8 % vol.  (05_fiche_saison_demo.md)
-Q : Quel est le prix de la Blonde ?           → Je ne trouve pas cette information dans la documentation.
+Tu cherches une bière brassée avec des céréales certifiées bio ? Depuis 2017, c'est notre seule façon de
+travailler. Passe donc nous voir ce jeudi soir à la grange pour une dégustation, on t'attend pour échanger
+autour d'un verre 🍻 À consommer avec modération.
+#BrasserieDemoDuHainaut #BiereBio #BiereArtisanale #CraftBeer #Hainaut
 ```
 
-Social listening (`trends`, flux de démo) :
+**Ce que la relecture humaine a corrigé** (détail dans chaque fichier d'exemple) :
+
+| Post | Problème | Détecté par |
+|---|---|---|
+| Expertise Bio | « notre meilleur argument » (superlatif interdit) | **garde-fou** |
+| Expertise Bio | « toutes nos bières sont certifiées » : trop large, les éditions saisonnières ne le sont pas toujours | relecture humaine |
+| Instagram | aucun émoji (la charte en demande 1 à 3) | garde-fou (règle ajoutée après ce cas) |
+| Coulisses du Brassage | « Depuis 2017, c'est ici que nos journées commencent » : la brasserie est fondée en 2016, 2017 est la date de la certification bio. **Post rejeté** | relecture humaine : le chiffre existe dans les sources, le garde-fou ne peut pas voir l'erreur de sens |
+
+Base de connaissances (`ask`, Gemini) :
 
 ```text
-terme suivi          type         mentions   exemple
-Brasserie Exemple    concurrent   1          La Brasserie Exemple lance une bière bio au sureau…
+Q : Êtes-vous labellisés Biogarantie ?
+R : Non, notre brasserie n'est pas labellisée Biogarantie. Nous sommes toutefois certifiés bio depuis 2017
+    selon le règlement européen […]. Une candidature pour le label Biogarantie est à l'étude pour 2027.
+    (06_labels_bio.md)
+
+Q : Quel est le prix d'un fût de Blonde ?
+R : Je ne trouve pas cette information dans la documentation.
 ```
 
-Mini-évaluation (`python -m tests.eval`, mode démo) :
+### L'évaluation a guidé l'itération des prompts
+
+| Version des prompts | Cas conformes | Chiffres ou labels non sourcés | Problèmes |
+|---|---|---|---|
+| v1 | 8 / 10 | **0** | post distributeur trop court (528 car.), « meilleur » sur Instagram |
+| v2 (structure en 3 paragraphes, superlatifs listés, tutoiement explicite) | **10 / 10** | **0** | — |
+
+Les changements sont tracés en tête de chaque fichier `prompts/persona_*.md`. Il s'agit d'une seule exécution par version : avec un LLM, il faudrait plusieurs passages pour une conclusion statistique.
+
+Contrôle des détecteurs (inclus dans l'évaluation) :
 
 ```text
-10/10 cas conformes, confiance moyenne 0.60
-
-Contrôle des détecteurs (posts volontairement fautifs)
 degré + label inventés        Chiffre non sourcé : 8 · Label non sourcé : Demeter
-superlatifs + santé + émojis  Formule interdite : « meilleure bière », « incroyable »,
-                              « bonne pour la santé » · 16 émojis (maximum 3)
+superlatifs + santé + émojis  Formule interdite : « meilleure bière », « incroyable », « bonne pour la santé »
 ```
+
+Sans clé API, `LLM_PROVIDER=fake` fait tourner toute la chaîne hors ligne : le `FakeLLMClient` assemble des phrases tirées des passages RAG (style plat, mais même code de validation).
 
 ---
 
@@ -288,6 +307,8 @@ Les publishers de `src/social.py` sont écrits d'après la documentation officie
 
 - **Le garde-fou vérifie la présence, pas le sens.** « Nous sommes labellisés Biogarantie » passe le contrôle des labels, parce que le mot figure dans le contexte… dans la phrase qui dit que nous ne l'avons PAS. Un chiffre attribué à la mauvaise bière passe aussi. La relecture humaine reste indispensable.
 - **Hallucinations non chiffrées** : un nom, une anecdote ou une citation inventés ne sont pas détectés automatiquement.
+- **Erreurs de sens avec des chiffres exacts** : cas réel observé avec Gemini, « depuis 2017, c'est ici que nos journées commencent » (2017 est la date de la certification, pas de l'ouverture). Seule la relecture humaine l'a vu.
+- **Ratés du retrieval** : à la question « avec quoi servir la Saison ? », le passage des accords mets n'était pas dans le top 6 ; le modèle a répondu que l'information manquait. L'échec est sûr (rien d'inventé), mais incomplet.
 - **Score de confiance** : c'est une auto-évaluation du modèle corrigée par des règles, pas une probabilité calibrée.
 - **Mode démo** : ce n'est pas un LLM. Les textes sont exacts mais peu rédigés.
 - **Social listening limité au texte des flux** : pas d'accès aux posts des concurrents sur LinkedIn ou Instagram. Leurs API ne le permettent pas sans partenariat, et le scraping de ces plateformes est interdit par leurs CGU. Les liens Google News sont des redirections, donc la déduplication par URL peut laisser passer un même article venu de deux sources.

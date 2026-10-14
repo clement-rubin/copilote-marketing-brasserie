@@ -132,6 +132,7 @@ class Post(BaseModel):
     avertissements: list[str] = Field(default_factory=list)
     article_url: str | None = None  # article de veille qui a servi de point de départ
     contexte: str = ""  # passages RAG + article fournis au LLM : traçabilité et re-vérification
+    genere_par: str = ""  # fournisseur et modèle qui ont rédigé le brouillon (ex. « gemini:gemini-3.1-flash-lite »)
     prompt_image: str | None = None
     image_path: str | None = None  # visuel généré localement (prototype)
     image_url: str | None = None  # URL publique du visuel (exigée par l'API Instagram)

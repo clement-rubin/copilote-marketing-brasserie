@@ -85,6 +85,7 @@ def generate_post(
         draft = fix_instagram_hashtags(draft)
 
     post = Post.from_draft(draft, persona, article_url=article.url)
+    post.genere_par = f"{llm.name}:{getattr(llm, 'model', '')}".rstrip(":")
     post.contexte = f"{context}\n\n[article] {article.titre}\n{article.resume}"
     post = guard.check(post, post.contexte)
     post.prompt_image = image_prompt(post)

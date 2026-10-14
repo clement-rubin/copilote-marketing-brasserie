@@ -50,3 +50,18 @@ def test_check_is_idempotent():
 def test_format_problems_for_short_linkedin_post():
     problems = guard.format_problems(linkedin("Trop court : ce post LinkedIn ne respecte pas la charte éditoriale."))
     assert any("Longueur" in p for p in problems)
+
+
+def test_register_vouvoiement_on_instagram_is_flagged():
+    draft = PostDraft(texte="Passez nous voir à la grange jeudi soir, on vous attend pour goûter la Saison.",
+                      hashtags=["#A", "#B", "#C", "#D", "#E"], score_confiance=0.9)
+    post = Post.from_draft(draft, Persona.INSTAGRAM, None)
+    assert any("tutoiement" in p for p in guard.register_problems(post))
+
+
+def test_register_tutoiement_on_instagram_is_fine_and_ambiguous_words_ignored():
+    insta = Post.from_draft(PostDraft(texte="Passe nous voir à la grange jeudi soir, tu goûteras la Saison.",
+                                      hashtags=["#A", "#B", "#C", "#D", "#E"], score_confiance=0.9), Persona.INSTAGRAM, None)
+    assert guard.register_problems(insta) == []
+    linkedin_post = linkedin("Le temps passe vite et le ton de la marque reste le même pour vos clients.")
+    assert guard.register_problems(linkedin_post) == []
