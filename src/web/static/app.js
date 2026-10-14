@@ -497,6 +497,10 @@ async function render() {
   refreshBadge();
 }
 
-window.addEventListener("hashchange", () => { render(); window.scrollTo({ top: 0 }); });
+window.addEventListener("hashchange", () => {
+  if (window.tourNavigating) return; // la visite guidée déclenche elle-même le rendu et l'attend
+  render();
+  window.scrollTo({ top: 0 });
+});
 api("GET", "/api/dashboard").then((d) => renderConfig(d.config)).catch(() => {});
 render();

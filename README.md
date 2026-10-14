@@ -116,6 +116,8 @@ Une interface complète, conçue comme le **registre d'un brasseur** (papier kra
 | **Base de connaissances** | questions-réponses sourcées sur la documentation de la marque |
 | **Contrôle qualité** | mini-évaluation sur 10 cas et test des détecteurs, en un clic |
 
+**Visite guidée intégrée** : elle démarre seule à la première ouverture, puis reste accessible via le bouton « Visite guidée ». En 15 étapes, un projecteur parcourt chaque vue et explique quelle mission de l'offre elle couvre. Navigation avec les flèches, Échap pour quitter.
+
 Côté technique : une **API REST FastAPI** (`src/web/app.py`, documentation automatique sur `/docs`) qui appelle exactement les mêmes fonctions que la CLI, et une page HTML/CSS/JavaScript sans framework (`src/web/static/`). Tout texte venant de l'API est inséré avec `textContent`, jamais `innerHTML` : pas d'injection HTML possible. Usage local, mono-utilisateur, sans authentification.
 
 Démo guidée de toute la chaîne en ligne de commande (Windows) : `powershell -ExecutionPolicy Bypass -File demo.ps1`
