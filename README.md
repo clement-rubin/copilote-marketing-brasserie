@@ -89,7 +89,7 @@ Le design initial est dans [docs/superpowers/specs/](docs/superpowers/specs/2026
 Prérequis : Python 3.11 ou 3.12, puis Git.
 
 ```bash
-git clone <url-du-depot> && cd copilote-marketing
+git clone https://github.com/clement-rubin/copilote-marketing-brasserie.git && cd copilote-marketing-brasserie
 python -m venv .venv
 source .venv/bin/activate        # Windows : .venv\Scripts\activate
 pip install -r requirements.txt
@@ -153,8 +153,8 @@ Deux jobs suffisent : un passage hebdomadaire de veille et génération, puis un
 
 ```bash
 # cron (Linux / macOS)
-0 8 * * 1    cd /chemin/copilote-marketing && .venv/bin/python -m src.cli weekly
-*/15 * * * * cd /chemin/copilote-marketing && .venv/bin/python -m src.cli publish-due
+0 8 * * 1    cd /chemin/copilote-marketing-brasserie && .venv/bin/python -m src.cli weekly
+*/15 * * * * cd /chemin/copilote-marketing-brasserie && .venv/bin/python -m src.cli publish-due
 ```
 
 ```bat
