@@ -12,6 +12,8 @@ Veille du marché → base de connaissances de la marque → 3 posts par semaine
 ![Gemini](https://img.shields.io/badge/LLM-Gemini%20%C2%B7%20Claude%20%C2%B7%20OpenAI-4285F4?logo=googlegemini&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-86%20passing-2ea44f)
 
+**[▶ Démo en ligne](https://copilote-marketing-brasserie.netlify.app)** · lecture seule, données réelles générées avec Gemini
+
 [Résultats réels](#3-résultats-avec-gemini) · [Démarrage rapide](#2-démarrage-rapide) · [Rapport d'audit](docs/AUDIT_CONFORMITE.md) · [Exemples de posts](out/examples/)
 
 </div>
@@ -287,6 +289,8 @@ Chaque appel au LLM a un délai maximal de 60 s, des réessais sur les erreurs t
 ## 8. Déploiement et API sociales
 
 ### Démo en ligne (Netlify)
+
+**En ligne : https://copilote-marketing-brasserie.netlify.app**
 
 `python -m src.cli export-site` produit `site/`, une **version en lecture seule** de l'interface : vraies données générées avec Gemini, réponses et évaluation pré-calculées. `netlify.toml` le publie tel quel, sans build. Elle est en lecture seule parce que Netlify n'héberge que du statique (pas de serveur Python) et qu'une clé LLM ne doit jamais être exposée sur un site public.
 
