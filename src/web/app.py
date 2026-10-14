@@ -101,6 +101,12 @@ def _guard(action: Callable[[], Post]) -> Post:
         raise HTTPException(400, str(error))
 
 
+def _models_of(provider: str) -> list[str]:
+    """Modèles configurés pour le fournisseur actif (Gemini peut en lister plusieurs, en secours)."""
+    variable = {"gemini": "GEMINI_MODEL", "openai": "OPENAI_MODEL", "anthropic": "ANTHROPIC_MODEL"}.get(provider)
+    return [m.strip() for m in env(variable).split(",") if m.strip()] if variable else []
+
+
 # --------------------------------------------------------------------------- Pages
 
 
@@ -135,6 +141,7 @@ def dashboard() -> dict:
     return {
         "config": {
             "llm": env("LLM_PROVIDER", "fake"),
+            "modeles": _models_of(env("LLM_PROVIDER", "fake")),
             "images": env("IMAGE_PROVIDER", "placeholder"),
             "publication": env("PUBLISH_MODE", "mock"),
         },

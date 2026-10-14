@@ -478,7 +478,8 @@ const views = {
 
 function renderConfig(config) {
   const box = document.getElementById("config-chips");
-  box.replaceChildren(...[["LLM", config.llm], ["Images", config.images], ["Publication", config.publication]]
+  const llm = config.modeles && config.modeles.length ? `${config.llm} · ${config.modeles[0]}` : config.llm;
+  box.replaceChildren(...[["LLM", llm], ["Images", config.images], ["Publication", config.publication]]
     .map(([k, v]) => h("div", { class: "chip-config" }, k, h("b", {}, v))));
 }
 
